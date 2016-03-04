@@ -1,0 +1,37 @@
+{
+  "name": "better-queue",
+  "version": "1.0.0",
+  "description": "Better Queue for NodeJS",
+  "main": "lib/queue.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leanderlee/better-queue.git"
+  },
+  "keywords": [
+    "persistent",
+    "network",
+    "async",
+    "queue",
+    "best",
+    "better"
+  ],
+  "author": "Leander Lee <me@leander.ca>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leanderlee/better-queue/issues"
+  },
+  "homepage": "https://github.com/leanderlee/better-queue",
+  "devDependencies": {
+    "mocha": "^2.3.4"
+  },
+  "dependencies": {
+    "node-eta": "^0.9.0",
+    "node-uuid": "^1.4.7"
+  }
+}
