@@ -44,8 +44,8 @@ describe('Ticket', function() {
 
   it('should fail and emit', function (done) {
     assert.ok(!t.isFailed, 'ticket not failed');
-    t.once('error', function (err) {
-      assert.deepEqual(err, new Error('some_error'));
+    t.once('fail', function (err) {
+      assert.equal(err, 'some_error');
       assert.ok(t.isFailed, 'ticket failed');
       done();
     })

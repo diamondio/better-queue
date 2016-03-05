@@ -55,14 +55,14 @@ describe('Tickets', function() {
     assert.ok(!t1.isFailed, 'ticket 1 not failed');
     assert.ok(!t2.isFailed, 'ticket 2 not failed');
     var called = 0;
-    t1.once('error', function (err) {
-      assert.deepEqual(err, new Error('some_error'));
+    t1.once('fail', function (err) {
+      assert.equal(err, 'some_error');
       assert.ok(t1.isFailed, 'ticket 1 failed');
       called++;
       if (called == 2) { done() }
     })
-    t2.once('error', function (err) {
-      assert.deepEqual(err, new Error('some_error'));
+    t2.once('fail', function (err) {
+      assert.equal(err, 'some_error');
       assert.ok(t2.isFailed, 'ticket 2 failed');
       called++;
       if (called == 2) { done() }

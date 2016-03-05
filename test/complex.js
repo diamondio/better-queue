@@ -1,5 +1,6 @@
 var assert = require('assert');
 var Queue = require('../lib/queue');
+var MemoryStore = require('../lib/stores/memory');
 
 describe('Complex Queue', function() {
 
@@ -27,7 +28,51 @@ describe('Complex Queue', function() {
     })
   })
 
-  it('should retry', function () {
+  it('should store properly', function (done) {
+    var s = new MemoryStore();
+    var q1 = new Queue(function (n, cb) {
+      cb(null, n+1);
+    }, { store: s })
+    q1.pause();
+    q1.push(1);
+    q1.push(2);
+    q1.push(3);
+    var q2 = new Queue(function (n, cb) {
+      cb();
+      if (n === 3) {
+        done();
+      }
+    }, { store: s });
+  })
+
+  it('should retry', function (done) {
+    var tries = 0;
+    var q = new Queue(function (n, cb) {
+      tries++;
+      if (tries === 3) {
+        cb();
+        done();
+      } else {
+        cb('fail');
+      }
+    }, { maxRetries: 3 });
+    q.push(1);
+  })
+
+  it('should fail retry', function (done) {
+    var tries = 0;
+    var q = new Queue(function (n, cb) {
+      tries++;
+      if (tries === 3) {
+        cb();
+      } else {
+        cb('fail');
+      }
+    }, { maxRetries: 2 })
+    q.on('task_failed', function () {
+      done();
+    });
+    q.push(1);
   })
 
   it('should process delay', function () {
@@ -42,4 +87,7 @@ describe('Complex Queue', function() {
   it('should cancel if running', function () {
   })
   
+  // TODO: Test stores
+  // TODO: Test auto-resume
+
 })
