@@ -3,7 +3,7 @@ var Queue = require('../lib/queue');
 
 describe('Basic Queue', function() {
 
-  it('should run filo', function (done) {
+  it('should run fifo', function (done) {
     var q = new Queue(function (num, cb) {
       cb(null, num + 1)
     })
@@ -28,13 +28,10 @@ describe('Basic Queue', function() {
     })
   })
 
-  it('should run fifo', function (done) {
-    var q = new Queue({
-      process: function (num, cb) {
-        cb(null, num+1)
-      },
-      fifo: true
-    })
+  it('should run filo', function (done) {
+    var q = new Queue(function (num, cb) {
+      cb(null, num+1)
+    }, { filo: true })
     var finished = 0;
     q.push(1, function (err, r) {
       assert.equal(finished, 2);
@@ -148,5 +145,29 @@ describe('Basic Queue', function() {
     q.push({ number: 2 }, finish);
   })
   
+  it('should pause and resume', function (done) {
+    var running = false;
+    var q = new Queue(function (n, cb) {
+      running = true;
+      return {
+        pause: function () {
+          running = false;
+        },
+        resume: function () {
+          running = true;
+          cb();
+          done();
+        }
+      }
+    })
+    q.push(1);
+    setTimeout(function () {
+      assert.ok(running);
+      q.pause();
+      assert.ok(!running);
+      q.resume();
+  }, 1)
+  })
+
   
 })
