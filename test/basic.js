@@ -3,21 +3,6 @@ var Queue = require('../lib/queue');
 
 describe('Basic Queue', function() {
 
-  it('should instantiate', function () {
-    var q = new Queue({
-      accept: function (input, cb) { cb(null, input) },
-      process: function (task, cb) { cb(null, {}) },
-      merge: function (task1, task2, cb) { cb(null, task2) },
-      running: function (working, task, cb) { cb(null, task) },
-
-      fifo: false,
-      batchSize: 1,
-      concurrent: 1,
-      maxTimeout: Infinity,
-      maxRetries: Infinity,
-    })
-  })
-
   it('should run filo', function (done) {
     var q = new Queue(function (num, cb) {
       cb(null, num + 1)
@@ -69,9 +54,9 @@ describe('Basic Queue', function() {
     })
   })
 
-  it('should accept before process', function (done) {
+  it('should filter before process', function (done) {
     var q = new Queue({
-      accept: function (n, cb) {
+      filter: function (n, cb) {
         cb(null, n === 2 ? false : n);
       },
       process: function (n, cb) {
@@ -88,6 +73,25 @@ describe('Basic Queue', function() {
       assert.equal(r, 4);
       done();
     })
+  })
+
+  it('should drain and empty', function (done) {
+    var emptied = false;
+    var q = new Queue({
+      empty: function () {
+        emptied = true;
+      },
+      drain: function () {
+        assert.ok(emptied);
+        done();
+      },
+      process: function (n, cb) {
+        cb(null, n+1);
+      },
+    })
+    q.push(1)
+    q.push(2)
+    q.push(3)
   })
 
   it('should queue 200 things', function (done) {
@@ -126,7 +130,7 @@ describe('Basic Queue', function() {
             setTimeout(function () {
               locks[task.number] = false;
               wait();
-            }, 2)
+            }, 1)
           }
         }
         wait();

@@ -7,10 +7,10 @@ describe('Complex Queue', function() {
     var q = new Queue({
       batchSize: 3,
       process: function (batch, cb) {
-        assert.equal(Object.keys(batch.tasks).length, 3);
+        assert.equal(Object.keys(batch).length, 3);
         var total = 0;
-        Object.keys(batch.tasks).forEach(function (taskId) {
-          total += batch.tasks[taskId];
+        Object.keys(batch).forEach(function (taskId) {
+          total += batch[taskId];
         })
         cb(null, total);
       },
