@@ -30,13 +30,16 @@ describe('Complex Queue', function() {
   it('should retry', function () {
   })
 
+  it('should process delay', function () {
+  })
+
   it('should max timeout', function () {
   })
 
   it('should merge tasks', function () {
   })
   
-  it('should handle if running', function () {
+  it('should cancel if running', function () {
   })
   
 })

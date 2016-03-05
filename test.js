@@ -5,7 +5,7 @@ var q = new Queue(function (task, cb) {
     console.log('finished' + task);
     cb(null, { message: 'done' + task });
   }, task*1000);
-}, { concurrent: 1, idleTimeout: 1000 })
+}, { concurrent: 2, idleTimeout: 1000 })
 console.log('queued 1')
 q.push(1);
 console.log('queued 2')

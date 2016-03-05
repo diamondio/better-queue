@@ -113,36 +113,35 @@ describe('Basic Queue', function() {
   it('should concurrently handle tasks', function (done) {
     var locks = {};
     var ok = false;
-    var q = new Queue({
-      concurrent: 3,
-      process: function (task, cb) {
-        locks[task.number] = true;
-        var wait = function () {
-          if (locks[0] && locks[1] && locks[2]) {
-            ok = true;
-            cb();
-          } else if (ok) {
-            cb();
-          } else {
-            setTimeout(function () {
-              locks[task.number] = false;
-              wait();
-            }, 1)
-          }
+    var q = new Queue(function (task, cb) {
+      locks[task.number] = true;
+      var wait = function () {
+        if (locks[0] && locks[1] && locks[2]) {
+          ok = true;
+          locks[task.number] = false;
+          cb();
+        } else if (ok) {
+          locks[task.number] = false;
+          cb();
+        } else {
+          setImmediate(function () {
+            wait();
+          })
         }
-        wait();
       }
-    })
+      wait();
+    }, { concurrent: 3 })
     var finished = 0;
     var finish = function () {
       finished++;
-      if (finished >= 3) {
+      if (finished >= 4) {
         done();
       }
     }
     q.push({ number: 0 }, finish);
     q.push({ number: 1 }, finish);
     q.push({ number: 2 }, finish);
+    q.push({ number: 3 }, finish);
   })
   
   it('should pause and resume', function (done) {
@@ -169,5 +168,4 @@ describe('Basic Queue', function() {
   }, 1)
   })
 
-  
 })
