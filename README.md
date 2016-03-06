@@ -168,8 +168,7 @@ ages.push({ id: 'mary', age: 23 });
 
 Note how the queue will only handle at most 3 items at a time.
 
-If the task has no ID, you can still batch the tasks, but they will
-be assigned a uuid.
+Below is another example of a batched call with numbers.
 
 ```js
 var ages = new Queue(function (batch, cb) {
