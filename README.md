@@ -14,13 +14,13 @@ Better Queue is designed to be simple to set up but still let you do complex thi
 
 - Persistent (and extendable) storage
 - Batched processing
-- Concurrency
 - Prioritize tasks
 - Merge/filter tasks
-- Retry on fail
-- Cancel already running tasks
 - Progress events (with ETA!)
 - Fine-tuned timing controls
+- Retry on fail
+- Concurrent batch processing
+- Cancel already running tasks
 
 ```bash
 npm install --save better-queue
