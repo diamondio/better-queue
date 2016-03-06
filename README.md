@@ -75,26 +75,6 @@ You will be able to combine any (and all) of these options
 for your queue!
 
 
-## Setting up the queue
-
-You can control how many tasks happen at the same time.
-
-```js
-var q = new Queue(fn, { concurrent: 3 })
-```
-
-Now the queue will allow 3 tasks running at the same time. (By 
-default, we handle tasks one at a time.)
-
-You can also turn the queue into a stack by turning on `filo`.
-
-```js
-var q = new Queue(fn, { filo: true })
-```
-
-Now items you push on will be handled first.
-
-
 ## Queuing
 
 It's very easy to push tasks into the queue.
@@ -151,6 +131,24 @@ the queue (there may still be tasks running!)
 
 `drain` event fires when there are no more tasks on the queue _and_
 when no more tasks are running.
+
+You can control how many tasks process at the same time.
+
+```js
+var q = new Queue(fn, { concurrent: 3 })
+```
+
+Now the queue will allow 3 tasks running at the same time. (By 
+default, we handle tasks one at a time.)
+
+You can also turn the queue into a stack by turning on `filo`.
+
+```js
+var q = new Queue(fn, { filo: true })
+```
+
+Now items you push on will be handled first.
+
 
 
 [back to top](#table-of-contents)
