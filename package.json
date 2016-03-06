@@ -17,6 +17,12 @@
     "persistent",
     "network",
     "async",
+    "control",
+    "flow",
+    "pipeline",
+    "timeout",
+    "priority",
+    "cargo",
     "queue",
     "best",
     "better"
