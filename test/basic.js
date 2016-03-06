@@ -113,15 +113,15 @@ describe('Basic Queue', function() {
   it('should concurrently handle tasks', function (done) {
     var locks = {};
     var ok = false;
-    var q = new Queue(function (task, cb) {
-      locks[task.number] = true;
+    var q = new Queue(function (n, cb) {
+      locks[n] = true;
       var wait = function () {
         if (locks[0] && locks[1] && locks[2]) {
           ok = true;
-          locks[task.number] = false;
+          locks[n] = false;
           cb();
         } else if (ok) {
-          locks[task.number] = false;
+          locks[n] = false;
           cb();
         } else {
           setImmediate(function () {
@@ -138,10 +138,10 @@ describe('Basic Queue', function() {
         done();
       }
     }
-    q.push({ number: 0 }, finish);
-    q.push({ number: 1 }, finish);
-    q.push({ number: 2 }, finish);
-    q.push({ number: 3 }, finish);
+    q.push(0, finish);
+    q.push(1, finish);
+    q.push(2, finish);
+    q.push(3, finish);
   })
   
   it('should pause and resume', function (done) {

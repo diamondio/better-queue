@@ -87,7 +87,13 @@ describe('Complex Queue', function() {
     }, 1)
   })
 
-  it('should max timeout', function () {
+  it('should max timeout', function (done) {
+    var q = new Queue(function (tasks, cb) {
+    }, { processTimeout: 1 })
+    q.on('task_failed', function () {
+      done();
+    });
+    q.push(1);
   })
 
   it('should merge tasks', function (done) {
