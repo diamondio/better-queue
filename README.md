@@ -17,16 +17,18 @@ var Queue = require('better-queue');
 var q = new Queue(function (n, cb) {
   cb(null, n+1);
 })
-q.push(1, function (err, result) {
-  // result is 2
-})
+q.push(1)
+q.push(2)
+q.push(3)
 ```
 
 ## Table of contents
 
 - [Setting Up](#setting-up-the-queue)
-- [Tasks](#tasks)
+- [Queuing](#queuing)
+- [Task Management](#task-management)
 - [Timing](#timing)
+- [More Queuing](#timing)
 - [Storage](#storage)
 - [Full Documentation](#full-documentation)
 
@@ -55,7 +57,8 @@ var q = new Queue(fn, { filo: true })
 
 Now items you push on will be handled first.
 
-## Tasks
+
+## Queuing
 
 It's very easy to push tasks into the queue.
 
@@ -81,12 +84,6 @@ You can also listen to events on the results of the `push` call.
 ```js
 var q = new Queue(fn);
 q.push(1)
-  .on('progress', function (err, progress) {
-    // progress.eta - human readable string estimating time remaining
-    // progress.pct - % complete (out of 100)
-    // progress.current - # completed so far
-    // progress.total - # for completion
-  })
   .on('done', function (result) {
     // Task succeeded with {result}!
   })
@@ -94,7 +91,6 @@ q.push(1)
     // Task failed!
   })
 ```
-
 
 Alternatively, you can subscribe to the queue's events.
 
@@ -118,49 +114,116 @@ var q = new Queue(function (task, cb) {
   cb("failed");
 });
 q.on('task_failed', function (taskId, err) {
-  // taskId = 1, err: "failed"
+  // err: "failed"
 })
 q.push("some_task");
 ```
 
-You tasks are identified by an ID. If the task is not an object, or
-if the task doesn't have an `id` property, 
-
-
-## Batched Queues
-
-You can also handle many items at once.
+You can also format (and filter) the input that arrives from a push
+before it gets processed by the queue by passing in a `filter` 
+function.
 
 ```js
-var q = new Queue(fn, { batchSize: 3 })
+var greeter = new Queue(function (name, cb) {
+  console.log("Hello, %s!", name)
+  cb();
+}, {
+  filter: function (input, cb) {
+    if (input === 'Bob') {
+      return cb('not_allowed');
+    }
+    return cb(null, input.toUpperCase())
+  }
+});
+greeter.push('anna'); // Prints 'Hello, ANNA!'
 ```
 
-And now, if you push items onto the queue, `fn` will be an object
-where the key is the task ID.
-
-
-- filter function
-- merge function
-- cancelIfRunning
-
-#### Processing Tasks
-
-- process function
-- maxRetries
-- failed
-- finish
-- progress
-- drain and empty
+This can be particularly useful if your queue needs to do some pre-processing,
+input validation, database lookup, etc. before you load it onto the queue.
 
 
 [back to top](#table-of-contents)
 
 ---
 
-## Ordering
+## Task Management
 
-- fifo vs filo
-- priority function
+Tasks can be identified by an ID. If `task.id` is not defined,
+a unique ID is automatically assigned. This is particularly
+useful for more complex operations with tasks.
+
+For example, one thing you can do with the Task ID is merge
+tasks that have the same ID.
+
+```js
+var counter = new Queue(function (task, cb) {
+  console.log("I have %d %ss.", task.count, task.id);
+  cb();
+}, {
+  merge: function (oldTask, newTask, cb) {
+    oldTask.count += newTask.count;
+    cb(null, oldTask);
+  }
+})
+counter.push({ id: 'apple', count: 2 });
+counter.push({ id: 'apple', count: 1 });
+counter.push({ id: 'orange', count: 1 });
+counter.push({ id: 'orange', count: 1 });
+// Prints out:
+//   I have 3 apples.
+//   I have 2 oranges.
+```
+
+Your processing function can also be modified to handle multiple
+tasks at the same time. For example:
+
+```js
+var ages = new Queue(function (batch, cb) {
+  // Batch 1:
+  //   batch.steve.age = 21
+  //   batch.john.age = 34
+  //   batch.joe.age = 18
+  // Batch 2:
+  //   batch.mary.age = 23
+  cb();
+}, { batchSize: 3 })
+ages.push({ id: 'steve', age: 21 });
+ages.push({ id: 'john', age: 34 });
+ages.push({ id: 'joe', age: 18 });
+ages.push({ id: 'mary', age: 23 });
+```
+
+Note how the queue will only handle at most 3 items at a time.
+
+You can also define a priority function to control what tasks get
+processed first.
+
+```js
+var greeter = new Queue(function (name, cb) {
+  console.log("Greetings, %s.", name);
+  cb();
+}, {
+  priority: function (name, cb) {
+    if (name === "Steve") return cb(null, 10);
+    if (name === "Mary") return cb(null, 5);
+    if (name === "Joe") return cb(null, 5);
+    cb(null, 1);
+  }
+})
+greeter.push("Steve");
+greeter.push("John");
+greeter.push("Joe");
+greeter.push("Mary");
+
+// Prints out:
+//   Greetings, Steve.
+//   Greetings, Joe.
+//   Greetings, Mary.
+//   Greetings, John.
+```
+
+If `filo` is set to `true` in the example above, then Joe and Mary 
+would swap order.
 
 
 [back to top](#table-of-contents)
@@ -169,9 +232,70 @@ where the key is the task ID.
 
 ## Timing
 
-- processDelay
-- processTimeout
-- idleTimeout
+You can configure the queue to have a maxTimeout.
+
+```js
+var q = new Queue(function (name, cb) {
+  someLongTask(function () {
+    cb();
+  })
+}, { maxTimeout: 2000 })
+```
+
+After 2 seconds, the process will throw an error instead of wait for the
+callback to finish.
+
+You can also configure the queue to wait before it starts initially 
+processing. This is the behaviour of a timed cargo.
+
+```js
+var q = new Queue(function (batch, cb) {
+  // Batch of 5 will process after 2s.
+  cb();
+}, { batchSize: 10, processDelay: 2000 })
+q.push(1);
+q.push(2);
+setTimeout(function () {
+  q.push(3);
+  q.push(4);
+  q.push(5);
+}, 1000)
+```
+
+In the example above, the queue starts processing 2 seconds after the first
+task has been pushed on the queue.
+
+You can also set an `idleTimeout`, which will give the CPU some time to breathe
+between processing tasks.
+
+```js
+var q = new Queue(function (task, cb) {
+  console.log("Finished %s.", task)
+  cb();
+}, { idleTimeout: 1000 })
+q.push("task1");
+q.push("task2");
+```
+
+task1 will print, wait 1 second before printing task2.
+
+
+[back to top](#table-of-contents)
+
+---
+
+## Even more things
+
+  .on('progress', function (err, progress) {
+    // progress.eta - human readable string estimating time remaining
+    // progress.pct - % complete (out of 100)
+    // progress.current - # completed so far
+    // progress.total - # for completion
+  })
+- cancel, pause, resume
+- maxRetries
+- drain and empty
+
 
 [back to top](#table-of-contents)
 
@@ -187,17 +311,3 @@ where the key is the task ID.
 
 ## Full Documentation
 
-
-You can add options by passing in a second parameter, like so:
-
-```js
-var Queue = require('better-queue');
-var q = new Queue(function (n, cb) {
-  cb(null, n+1);
-}, {
-  
-})
-q.push(1, function (err, result) {
-  // result is 2
-})
-```
