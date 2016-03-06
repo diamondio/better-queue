@@ -361,6 +361,10 @@ uploader.push('/some/file2.jpg')
 uploader.push('/some/file3.jpg')
 ```
 
+Note that you may also use the functions _without_ specifying the array index
+when in batch mode. In that case, the status would apply to all items within
+the batch.
+
 [back to top](#table-of-contents)
 
 ---
