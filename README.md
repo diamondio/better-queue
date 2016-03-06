@@ -29,6 +29,7 @@ q.push(3)
 - [Task Management](#task-management)
 - [Timing](#timing)
 - [Control Flow](#control-flow)
+- [Status Updates](#status-updates)
 - [Storage](#storage)
 - [Full Documentation](#full-documentation)
 
@@ -245,27 +246,6 @@ tasks will fail (and will not retry.)
 var q = new Queue(fn, { maxRetries: 10 })
 ```
 
-#### Progress/Finish/Fail Specific Tasks
-
-The process function will be run in a context of a `Worker` object, which
-gives you access to functions to help report on the status of specific tasks.
-
-The example below illustrates how you can use these functions:
-
-```js
-var uploader = new Queue(function (file, cb) {
-  this.progress()
-});
-uploader.on('task_progress', function (taskId, progress) {})
-uploader.push('/some/file.jpg')
-  .on('progress', function (err, progress) {
-    // progress.eta - human readable string estimating time remaining
-    // progress.pct - % complete (out of 100)
-    // progress.current - # completed so far
-    // progress.total - # for completion
-  })
-```
-
 
 [back to top](#table-of-contents)
 
@@ -324,6 +304,67 @@ There are even more options to control
 [back to top](#table-of-contents)
 
 ---
+
+## Status Updates
+
+#### Progress/Finish/Fail
+
+The process function will be run in a context of a `Worker` object, which
+gives you access to functions to help report on the status of specific tasks.
+
+The example below illustrates how you can use these functions:
+
+```js
+var uploader = new Queue(function (file, cb) {
+  this.failed('some_error')
+  this.finish(result)
+  this.progress(bytesUploaded, totalBytes)
+});
+uploader.on('task_finish', function (taskId, result) {
+  // Handle finished result
+})
+uploader.on('task_failed', function (taskId, errorMessage) {
+  // Handle error
+})
+uploader.on('task_progress', function (taskId, completed, total) {
+  // Handle task progress
+})
+
+uploader.push('/some/file.jpg')
+  .on('finish', function (result) {
+    // Handle upload result
+  })
+  .on('failed', function (err) {
+    // Handle error
+  })
+  .on('progress', function (progress) {
+    // progress.eta - human readable string estimating time remaining
+    // progress.pct - % complete (out of 100)
+    // progress.current - # completed so far
+    // progress.total - # for completion
+  })
+```
+
+#### Update Status in Batch mode (batchSize > 1)
+
+You can add the array index to the beginning of params to update the status 
+of a task in the batch.
+
+```js
+var uploader = new Queue(function (files, cb) {
+  this.failed(0, 'some_error') // files[0] has failed with 'some_error'
+  this.finish(1, result)       // files[1] has finished with {result}
+  this.progress(2, 30, 100)    // files[2] is 30% complete
+}, { batchSize: 3 });
+uploader.push('/some/file1.jpg')
+uploader.push('/some/file2.jpg')
+uploader.push('/some/file3.jpg')
+```
+
+[back to top](#table-of-contents)
+
+---
+
 
 ## Storage
 
