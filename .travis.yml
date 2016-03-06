@@ -2,3 +2,5 @@ language: node_js
 node_js:
   - node
 sudo: false
+after_success:
+  - ./bin/codecov -e TRAVIS_NODE_VERSION
