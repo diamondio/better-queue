@@ -126,6 +126,66 @@ describe('Complex Queue', function() {
     });
   })
   
+  it('should respect id property (string)', function (done) {
+    var q = new Queue(function (o, cb) {
+      if (o.name === 'john') {
+        assert.equal(o.x, 4);
+        cb();
+      }
+      if (o.name === 'mary') {
+        assert.equal(o.x, 5);
+        cb();
+      }
+      if (o.name === 'jim') {
+        assert.equal(o.x, 2);
+        cb();
+      }
+    }, {
+      id: 'name',
+      merge: function (a, b, cb) {
+        a.x += b.x;
+        cb(null, a);
+      }
+    })
+    q.on('task_finish', function (taskId, r) {
+      if (taskId === 'mary') done();
+    })
+    q.push({ name: 'john', x: 4 });
+    q.push({ name: 'mary', x: 3 });
+    q.push({ name: 'jim', x: 1 });
+    q.push({ name: 'jim', x: 1 });
+    q.push({ name: 'mary', x: 2 });
+  })
+  
+  it('should respect id property (function)', function (done) {
+    var finished = 0;
+    var q = new Queue(function (n, cb) { cb(null, n) }, {
+      id: function (n, cb) {
+        cb(null, n % 2 === 0 ? 'even' : 'odd');
+      },
+      merge: function (a, b, cb) {
+        cb(null, a+b);
+      }
+    })
+    q.on('task_finish', function (taskId, r) {
+      finished++;
+      if (taskId === 'odd') {
+        assert.equal(r, 9);
+      }
+      if (taskId === 'even') {
+        assert.equal(r, 6);
+      }
+      if (finished === 2) {
+        done();
+      }
+    })
+    q.push(1);
+    q.push(2);
+    q.push(3);
+    q.push(4);
+    q.push(5);
+  })
+  
   it('should cancel if running', function (done) {
     var ran = 0;
     var cancelled = false;
