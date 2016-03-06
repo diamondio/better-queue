@@ -24,7 +24,7 @@ Better Queue is designed to be simple to set up but still let you do complex thi
 
 ---
 
-## Install
+#### Install (via npm)
 
 ```bash
 npm install --save better-queue
