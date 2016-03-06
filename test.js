@@ -62,7 +62,7 @@ var Queue = require('./lib/queue')
 
 
 // var q = new Queue(function (batch, cb) {
-//   console.log(Object.keys(batch).length)
+//   console.log(batch.length)
 //   cb();
 // }, { batchSize: 10, processDelay: 2000 })
 // q.push(1);
@@ -88,7 +88,8 @@ var ages = new Queue(function (batch, cb) {
   console.log(batch);
   cb();
 }, { batchSize: 3 })
-ages.push(1);
-ages.push(2);
-ages.push(3);
+ages.push({ id: 'steve', age: 21 });
+ages.push({ id: 'john', age: 34 });
+ages.push({ id: 'joe', age: 18 });
+ages.push({ id: 'mary', age: 23 });
 

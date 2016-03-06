@@ -153,11 +153,11 @@ tasks at the same time. For example:
 ```js
 var ages = new Queue(function (batch, cb) {
   // Batch 1:
-  //   batch.steve.age = 21
-  //   batch.john.age = 34
-  //   batch.joe.age = 18
+  //   [ { id: 'steve', age: 21 },
+  //     { id: 'john', age: 34 },
+  //     { id: 'joe', age: 18 } ]
   // Batch 2:
-  //   batch.mary.age = 23
+  //   [ { id: 'mary', age: 23 } ]
   cb();
 }, { batchSize: 3 })
 ages.push({ id: 'steve', age: 21 });
@@ -173,12 +173,7 @@ be assigned a uuid.
 
 ```js
 var ages = new Queue(function (batch, cb) {
-  // Example Batch:
-  //  {
-  //    '3387fbc2-a232-49a9-8d39-bc3337b1406c': 1,
-  //    '1f274601-4b7b-427f-a210-5793d2534221': 2,
-  //    '314fb1c9-8740-47df-b210-2d5730c33735': 3
-  //  }
+  // batch = [1,2,3]
   cb();
 }, { batchSize: 3 })
 ages.push(1);
