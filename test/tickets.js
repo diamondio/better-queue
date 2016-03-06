@@ -43,7 +43,7 @@ describe('Tickets', function() {
   it('should finish and emit', function (done) {
     assert.ok(!t1.isFinished, 'ticket 1 is not finished');
     assert.ok(!t2.isFinished, 'ticket 2 is not finished');
-    t2.once('done', function (result) {
+    t2.once('finish', function (result) {
       assert.deepEqual(result, { x: 1 });
       assert.ok(t2.isFinished, 'ticket 2 is finished');
       done();
@@ -55,13 +55,13 @@ describe('Tickets', function() {
     assert.ok(!t1.isFailed, 'ticket 1 not failed');
     assert.ok(!t2.isFailed, 'ticket 2 not failed');
     var called = 0;
-    t1.once('fail', function (err) {
+    t1.once('failed', function (err) {
       assert.equal(err, 'some_error');
       assert.ok(t1.isFailed, 'ticket 1 failed');
       called++;
       if (called == 2) { done() }
     })
-    t2.once('fail', function (err) {
+    t2.once('failed', function (err) {
       assert.equal(err, 'some_error');
       assert.ok(t2.isFailed, 'ticket 2 failed');
       called++;

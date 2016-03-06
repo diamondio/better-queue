@@ -34,7 +34,7 @@ describe('Ticket', function() {
 
   it('should finish and emit', function (done) {
     assert.ok(!t.isFinished, 'ticket is not finished');
-    t.once('done', function (result) {
+    t.once('finish', function (result) {
       assert.deepEqual(result, { x: 1 });
       assert.ok(t.isFinished, 'ticket is finished');
       done();
@@ -44,7 +44,7 @@ describe('Ticket', function() {
 
   it('should fail and emit', function (done) {
     assert.ok(!t.isFailed, 'ticket not failed');
-    t.once('fail', function (err) {
+    t.once('failed', function (err) {
       assert.equal(err, 'some_error');
       assert.ok(t.isFailed, 'ticket failed');
       done();
