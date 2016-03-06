@@ -3,25 +3,46 @@ var Queue = require('../lib/queue');
 
 describe('Basic Queue', function() {
 
-  it('should run fifo', function (done) {
-    var q = new Queue(function (num, cb) {
-      cb(null, num + 1)
+  it('should succeed', function (done) {
+    var q = new Queue(function (n, cb) {
+      cb(null, n+1)
     })
+    q.on('task_finish', function (taskId, r) {
+      assert.equal(r, 2);
+      done();
+    })
+    q.push(1, function (err, r) {
+      assert.equal(r, 2);
+    })
+  });
+
+  it('should fail', function (done) {
+    var q = new Queue(function (n, cb) {
+      cb('nope')
+    })
+    q.on('task_failed', function (taskId, msg) {
+      assert.equal(msg, 'nope');
+      done();
+    })
+    q.push(1, function (err, r) {
+      assert.equal(err, 'nope');
+    })
+  });
+
+  it('should run fifo', function (done) {
+    var q = new Queue(function (num, cb) { cb() })
     var finished = 0;
     q.push(3, function (err, r) {
       assert.equal(finished, 0);
-      assert.equal(r, 4);
       finished++;
     })
     q.push(2, function (err, r) {
       assert.equal(finished, 1);
-      assert.equal(r, 3);
       finished++;
     })
     setImmediate(function () {
       q.push(1, function (err, r) {
         assert.equal(finished, 2);
-        assert.equal(r, 2);
         finished++;
         done()
       })
@@ -29,62 +50,48 @@ describe('Basic Queue', function() {
   })
 
   it('should run filo', function (done) {
-    var q = new Queue(function (num, cb) {
-      cb(null, num+1)
-    }, { filo: true })
+    var q = new Queue(function (num, cb) { cb() }, { filo: true })
     var finished = 0;
     q.push(1, function (err, r) {
       assert.equal(finished, 2);
-      assert.equal(r, 2);
       finished++;
       done();
     })
     q.push(2, function (err, r) {
       assert.equal(finished, 1);
-      assert.equal(r, 3);
       finished++;
     })
     q.push(3, function (err, r) {
       assert.equal(finished, 0);
-      assert.equal(r, 4);
       finished++;
     })
   })
 
   it('should filter before process', function (done) {
-    var q = new Queue({
+    var q = new Queue(function (n, cb) { cb(null, n) }, {
       filter: function (n, cb) {
         cb(null, n === 2 ? false : n);
-      },
-      process: function (n, cb) {
-        cb(null, n+1);
-      },
-    })
-    q.push(1, function (err, r) {
-      assert.equal(r, 2);
+      }
     })
     q.push(2, function (err, r) {
-      assert.ok(err);
+      assert.equal(err, 'input_rejected');
     })
     q.push(3, function (err, r) {
-      assert.equal(r, 4);
+      assert.equal(r, 3);
       done();
     })
   })
 
   it('should drain and empty', function (done) {
     var emptied = false;
-    var q = new Queue({
+    var q = new Queue(function (n, cb) { cb() }, {
       empty: function () {
         emptied = true;
       },
       drain: function () {
         assert.ok(emptied);
         done();
-      },
-      process: function (n, cb) {
-        cb(null, n+1);
-      },
+      }
     })
     q.push(1)
     q.push(2)

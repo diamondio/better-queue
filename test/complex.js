@@ -80,7 +80,7 @@ describe('Complex Queue', function() {
       assert.equal(Object.keys(tasks).length, 2);
       cb();
       done();
-    }, { batchSize: 3, processDelay: 2 });
+    }, { batchSize: 3, processDelay: 3 });
     q.push(1);
     setTimeout(function () {
       q.push(2);
@@ -88,12 +88,14 @@ describe('Complex Queue', function() {
   })
 
   it('should max timeout', function (done) {
-    var q = new Queue(function (tasks, cb) {
-    }, { processTimeout: 1 })
-    q.on('task_failed', function () {
+    var q = new Queue(function (tasks, cb) {}, { processTimeout: 1 })
+    q.on('task_failed', function (taskId, msg) {
+      assert.equal(msg, 'task_timeout');
       done();
     });
-    q.push(1);
+    q.push(1, function (err, r) {
+      assert.equal(err, 'task_timeout');
+    });
   })
 
   it('should merge tasks', function (done) {
@@ -101,7 +103,6 @@ describe('Complex Queue', function() {
       if (o.id === 1) {
         assert.equal(o.x, 3);
         cb();
-        done();
       } else {
         cb();
       }
@@ -111,9 +112,18 @@ describe('Complex Queue', function() {
         cb(null, a);
       }
     })
-    q.push({ id: 0, x: 4 });
-    q.push({ id: 1, x: 1 });
-    q.push({ id: 1, x: 2 });
+    q.on('task_finish', function (taskId, r) {
+      if (taskId === '1') {
+        done();
+      }
+    })
+    q.push({ id: '0', x: 4 });
+    q.push({ id: '1', x: 1 }, function (err, r) {
+      assert.ok(!err)
+    });
+    q.push({ id: '1', x: 2 }, function (err, r) {
+      assert.ok(!err);
+    });
   })
   
   it('should cancel if running', function (done) {
