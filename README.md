@@ -32,6 +32,8 @@ npm install --save better-queue
 
 ---
 
+#### Quick Example
+
 ```js
 var Queue = require('better-queue');
 
@@ -49,7 +51,7 @@ var options = {
 
 var q = new Queue(function (n, cb) {
   cb(null, n);
-}, options)
+}, options) // Options are optional
 
 q.push(1)
 q.push(2)
