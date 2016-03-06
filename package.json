@@ -34,7 +34,6 @@
   },
   "homepage": "https://github.com/leanderlee/better-queue",
   "devDependencies": {
-    "codecov": "^1.0.1",
     "mocha": "^2.3.4"
   },
   "dependencies": {
