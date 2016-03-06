@@ -31,7 +31,7 @@ describe('Complex Queue', function() {
   it('should store properly', function (done) {
     var s = new MemoryStore();
     var q1 = new Queue(function (n, cb) {
-      cb(null, n+1);
+      cb(null, n);
     }, { store: s })
     q1.pause();
     q1.push(1);
@@ -75,13 +75,39 @@ describe('Complex Queue', function() {
     q.push(1);
   })
 
-  it('should process delay', function () {
+  it('should process delay', function (done) {
+    var q = new Queue(function (tasks, cb) {
+      assert.equal(Object.keys(tasks).length, 2);
+      cb();
+      done();
+    }, { batchSize: 3, processDelay: 2 });
+    q.push(1);
+    setTimeout(function () {
+      q.push(2);
+    }, 1)
   })
 
   it('should max timeout', function () {
   })
 
-  it('should merge tasks', function () {
+  it('should merge tasks', function (done) {
+    var q = new Queue(function (o, cb) {
+      if (o.id === 1) {
+        assert.equal(o.x, 3);
+        cb();
+        done();
+      } else {
+        cb();
+      }
+    }, {
+      merge: function (a, b, cb) {
+        a.x += b.x;
+        cb(null, a);
+      }
+    })
+    q.push({ id: 0, x: 4 });
+    q.push({ id: 1, x: 1 });
+    q.push({ id: 1, x: 2 });
   })
   
   it('should cancel if running', function (done) {
@@ -111,6 +137,5 @@ describe('Complex Queue', function() {
   
   // Test progress
   // TODO: Test stores
-  // TODO: Test auto-resume
 
 })
