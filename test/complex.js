@@ -84,9 +84,32 @@ describe('Complex Queue', function() {
   it('should merge tasks', function () {
   })
   
-  it('should cancel if running', function () {
+  it('should cancel if running', function (done) {
+    var ran = 0;
+    var cancelled = false;
+    var q = new Queue(function (n, cb) {
+      ran++;
+      if (ran >= 2) {
+        cb();
+      }
+      if (ran === 3) {
+        assert.ok(cancelled);
+        done();
+      }
+      return {
+        cancel: function () {
+          cancelled = true;
+        }
+      }
+    }, { cancelIfRunning: true })
+    q.push({ id: 1 });
+    q.push({ id: 2 });
+    setTimeout(function () {
+      q.push({ id: 1 });
+    }, 1)
   })
   
+  // Test progress
   // TODO: Test stores
   // TODO: Test auto-resume
 
