@@ -95,51 +95,25 @@ q.push(1)
 Alternatively, you can subscribe to the queue's events.
 
 ```js
-var q = new Queue(function (task, cb) {
-  cb(null, task.a + task.b);
-});
+var q = new Queue(fn);
 q.on('task_finish', function (taskId, result) {
   // taskId = 1, result: 3
   // taskId = 2, result: 5
 })
+q.on('task_failed', function (taskId, err) {
+  // Handle error
+})
+q.on('empty', function (){})
+q.on('drain', function (){})
 q.push({ id: 1, a: 1, b: 2 });
 q.push({ id: 2, a: 2, b: 3 });
 ```
 
-If the task failed for whatever reason; you can return an error
-in the callback.
+`empty` event fires when all of the tasks have been pulled off of
+the queue (there may still be tasks running!)
 
-```js
-var q = new Queue(function (task, cb) {
-  cb("failed");
-});
-q.on('task_failed', function (taskId, err) {
-  // err: "failed"
-})
-q.push("some_task");
-```
-
-You can also format (and filter) the input that arrives from a push
-before it gets processed by the queue by passing in a `filter` 
-function.
-
-```js
-var greeter = new Queue(function (name, cb) {
-  console.log("Hello, %s!", name)
-  cb();
-}, {
-  filter: function (input, cb) {
-    if (input === 'Bob') {
-      return cb('not_allowed');
-    }
-    return cb(null, input.toUpperCase())
-  }
-});
-greeter.push('anna'); // Prints 'Hello, ANNA!'
-```
-
-This can be particularly useful if your queue needs to do some pre-processing,
-input validation, database lookup, etc. before you load it onto the queue.
+`drain` event fires when there are no more tasks on the queue _and_
+when no more tasks are running.
 
 
 [back to top](#table-of-contents)
@@ -148,12 +122,11 @@ input validation, database lookup, etc. before you load it onto the queue.
 
 ## Task Management
 
-Tasks can be identified by an ID. If `task.id` is not defined,
-a unique ID is automatically assigned. This is particularly
-useful for more complex operations with tasks.
+#### Batch Processing
 
-For example, one thing you can do with the Task ID is merge
-tasks that have the same ID.
+Tasks can be identified by `task.id`. If it isn't defined,
+a unique ID is automatically assigned. One thing you can do 
+with Task ID is merge tasks with the same ID.
 
 ```js
 var counter = new Queue(function (task, cb) {
@@ -194,6 +167,49 @@ ages.push({ id: 'mary', age: 23 });
 ```
 
 Note how the queue will only handle at most 3 items at a time.
+
+If the task has no ID, you can still batch the tasks, but they will
+be assigned a uuid.
+
+```js
+var ages = new Queue(function (batch, cb) {
+  // Example Batch:
+  //  {
+  //    '3387fbc2-a232-49a9-8d39-bc3337b1406c': 1,
+  //    '1f274601-4b7b-427f-a210-5793d2534221': 2,
+  //    '314fb1c9-8740-47df-b210-2d5730c33735': 3
+  //  }
+  cb();
+}, { batchSize: 3 })
+ages.push(1);
+ages.push(2);
+ages.push(3);
+```
+
+
+#### Filtering, Validation and Priority
+
+You can also format (and filter) the input that arrives from a push
+before it gets processed by the queue by passing in a `filter` 
+function.
+
+```js
+var greeter = new Queue(function (name, cb) {
+  console.log("Hello, %s!", name)
+  cb();
+}, {
+  filter: function (input, cb) {
+    if (input === 'Bob') {
+      return cb('not_allowed');
+    }
+    return cb(null, input.toUpperCase())
+  }
+});
+greeter.push('anna'); // Prints 'Hello, ANNA!'
+```
+
+This can be particularly useful if your queue needs to do some pre-processing,
+input validation, database lookup, etc. before you load it onto the queue.
 
 You can also define a priority function to control what tasks get
 processed first.

@@ -73,9 +73,22 @@ var Queue = require('./lib/queue')
 //   q.push(5);
 // }, 1000)
 
-var q = new Queue(function (task, cb) {
-  console.log("Finished %s.", task)
+// var q = new Queue(function (task, cb) {
+//   console.log("Finished %s.", task)
+//   cb();
+// }, { idleTimeout: 1000 })
+// q.push("task1");
+// q.push("task2");
+
+var ages = new Queue(function (batch, cb) {
+  // Batch:
+  //  {
+  //    
+  //  }
+  console.log(batch);
   cb();
-}, { idleTimeout: 1000 })
-q.push("task1");
-q.push("task2");
+}, { batchSize: 3 })
+ages.push(1);
+ages.push(2);
+ages.push(3);
+
