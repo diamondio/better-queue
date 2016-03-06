@@ -84,15 +84,14 @@ describe('Basic Queue', function() {
 
   it('should drain and empty', function (done) {
     var emptied = false;
-    var q = new Queue(function (n, cb) { cb() }, {
-      empty: function () {
-        emptied = true;
-      },
-      drain: function () {
-        assert.ok(emptied);
-        done();
-      }
+    var q = new Queue(function (n, cb) { cb() })
+    q.on('empty', function () {
+      emptied = true;
     })
+    q.on('drain', function () {
+      assert.ok(emptied);
+      done();
+    });
     q.push(1)
     q.push(2)
     q.push(3)
