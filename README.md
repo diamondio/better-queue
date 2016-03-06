@@ -12,11 +12,41 @@
 
 Better Queue is designed to be simple to set up but still let you do complex things.
 
+- Persistent (and extendable) storage
+- Batched processing
+- Concurrency
+- Prioritize tasks
+- Merge/filter tasks
+- Retry on fail
+- Cancel already running tasks
+- Progress events (with ETA!)
+- Fine-tuned timing controls
+
+```bash
+npm install --save better-queue
+```
+
+---
+
 ```js
 var Queue = require('better-queue');
+
+var options = {
+  batchSize: 3,
+  maxTimeout: 1000,
+  concurrent: 2,
+  maxRetries: 3,
+  store: {
+    type: "sqlite",
+    path: "/path/to/db"
+  },
+  // ... and lots more!
+}
+
 var q = new Queue(function (n, cb) {
-  cb(null, n+1);
-})
+  cb(null, n);
+}, options)
+
 q.push(1)
 q.push(2)
 q.push(3)
