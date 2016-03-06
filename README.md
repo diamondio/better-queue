@@ -18,7 +18,47 @@ var q = new Queue(function (n, cb) {
   cb(null, n+1);
 })
 q.push(1, function (err, result) {
-  console.log(result);
+  // result is 2
 })
 ```
 
+## Table of contents
+
+- [Queuing](#queuing)
+- [Tasks](#tasks)
+- [Full Documentation](#full-documentation)
+
+---
+
+
+## Queuing
+
+#### Batch Sizes
+#### Timeouts and Delays
+#### Concurrency
+#### Ordering
+#### Storage
+
+## Tasks
+
+#### Filter
+#### Merge
+#### Events
+#### Progress
+
+## Full Documentation
+
+
+You can add options by passing in a second parameter, like so:
+
+```js
+var Queue = require('better-queue');
+var q = new Queue(function (n, cb) {
+  cb(null, n+1);
+}, {
+  
+})
+q.push(1, function (err, result) {
+  // result is 2
+})
+```
