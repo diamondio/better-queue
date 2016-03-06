@@ -20,7 +20,11 @@ Better Queue is designed to be simple to set up but still let you do complex thi
 - Fine-tuned timing controls
 - Retry on fail
 - Concurrent batch processing
-- Cancel already running tasks
+- ... and more!
+
+---
+
+## Install
 
 ```bash
 npm install --save better-queue
