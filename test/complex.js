@@ -88,7 +88,7 @@ describe('Complex Queue', function() {
   })
 
   it('should max timeout', function (done) {
-    var q = new Queue(function (tasks, cb) {}, { processTimeout: 1 })
+    var q = new Queue(function (tasks, cb) {}, { maxTimeout: 1 })
     q.on('task_failed', function (taskId, msg) {
       assert.equal(msg, 'task_timeout');
       done();
