@@ -53,12 +53,13 @@ describe('Basic Queue', function() {
     var q = new Queue(function (num, cb) { cb() }, {
       priority: function (n, cb) {
         if (n === 2) return cb(null, 10);
+        if (n === 1) return cb(null, 5);
         return cb(null, 1);
       }
     })
     var finished = 0;
     q.push(3, function (err, r) {
-      assert.equal(finished, 1);
+      assert.equal(finished, 2);
       finished++;
     })
     q.push(2, function (err, r) {
@@ -66,7 +67,7 @@ describe('Basic Queue', function() {
       finished++;
     })
     q.push(1, function (err, r) {
-      assert.equal(finished, 2);
+      assert.equal(finished, 1);
       finished++;
       done()
     })
