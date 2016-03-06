@@ -151,7 +151,7 @@ describe('Complex Queue', function() {
     }, 1)
   })
   
-  // Test progress
+  // TODO: Test progress
   // TODO: Test stores
 
 })
