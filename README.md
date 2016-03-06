@@ -309,10 +309,10 @@ There are even more options to control
 
 #### Progress/Finish/Fail
 
-The process function will be run in a context of a `Worker` object, which
-gives you access to functions to help report on the status of specific tasks.
+The process function will be run in a context with `progress`,
+`finish` and `failed` functions.
 
-The example below illustrates how you can use these functions:
+The example below illustrates how you can use these:
 
 ```js
 var uploader = new Queue(function (file, cb) {
