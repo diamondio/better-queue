@@ -28,7 +28,7 @@ q.push(3)
 - [Queuing](#queuing)
 - [Task Management](#task-management)
 - [Timing](#timing)
-- [More Queuing](#timing)
+- [Control Flow](#control-flow)
 - [Storage](#storage)
 - [Full Documentation](#full-documentation)
 
@@ -205,7 +205,7 @@ greeter.push('anna'); // Prints 'Hello, ANNA!'
 This can be particularly useful if your queue needs to do some pre-processing,
 input validation, database lookup, etc. before you load it onto the queue.
 
-You can also define a priority function to control what tasks get
+You can also define a priority function to control which tasks get
 processed first.
 
 ```js
@@ -236,13 +236,44 @@ If `filo` is set to `true` in the example above, then Joe and Mary
 would swap order.
 
 
+#### Retry
+
+You can set tasks to retry `maxRetries` times if they fail. By default,
+tasks will fail (and will not retry.)
+
+```js
+var q = new Queue(fn, { maxRetries: 10 })
+```
+
+#### Progress/Finish/Fail Specific Tasks
+
+The process function will be run in a context of a `Worker` object, which
+gives you access to functions to help report on the status of specific tasks.
+
+The example below illustrates how you can use these functions:
+
+```js
+var uploader = new Queue(function (file, cb) {
+  this.progress()
+});
+uploader.on('task_progress', function (taskId, progress) {})
+uploader.push('/some/file.jpg')
+  .on('progress', function (err, progress) {
+    // progress.eta - human readable string estimating time remaining
+    // progress.pct - % complete (out of 100)
+    // progress.current - # completed so far
+    // progress.total - # for completion
+  })
+```
+
+
 [back to top](#table-of-contents)
 
 ---
 
 ## Timing
 
-You can configure the queue to have a maxTimeout.
+You can configure the queue to have a `maxTimeout`.
 
 ```js
 var q = new Queue(function (name, cb) {
@@ -252,59 +283,42 @@ var q = new Queue(function (name, cb) {
 }, { maxTimeout: 2000 })
 ```
 
-After 2 seconds, the process will throw an error instead of wait for the
+After 2 seconds, the process will throw an error instead of waiting for the
 callback to finish.
 
-You can also configure the queue to wait before it starts initially 
-processing. This is the behaviour of a timed cargo.
+You can also delay the queue before it starts its processing. This is the 
+behaviour of a timed cargo.
 
 ```js
 var q = new Queue(function (batch, cb) {
-  // Batch of 5 will process after 2s.
+  // Batch [1,2] will process after 2s.
   cb();
-}, { batchSize: 10, processDelay: 2000 })
+}, { batchSize: 5, processDelay: 2000 })
 q.push(1);
-q.push(2);
 setTimeout(function () {
-  q.push(3);
-  q.push(4);
-  q.push(5);
+  q.push(2);
 }, 1000)
 ```
 
-In the example above, the queue starts processing 2 seconds after the first
-task has been pushed on the queue.
-
-You can also set an `idleTimeout`, which will give the CPU some time to breathe
-between processing tasks.
+You can also set `idleTimeout`, which will delay processing between tasks.
 
 ```js
 var q = new Queue(function (task, cb) {
-  console.log("Finished %s.", task)
-  cb();
+  cb(); // Will wait 1 second before taking the next task
 }, { idleTimeout: 1000 })
-q.push("task1");
-q.push("task2");
+q.push(1);
+q.push(2);
 ```
-
-task1 will print, wait 1 second before printing task2.
-
 
 [back to top](#table-of-contents)
 
 ---
 
-## Even more things
+## Control Flow
 
-  .on('progress', function (err, progress) {
-    // progress.eta - human readable string estimating time remaining
-    // progress.pct - % complete (out of 100)
-    // progress.current - # completed so far
-    // progress.total - # for completion
-  })
+There are even more options to control
 - cancel, pause, resume
-- maxRetries
-- drain and empty
+- cancelIfRunning
 
 
 [back to top](#table-of-contents)

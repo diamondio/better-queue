@@ -53,10 +53,9 @@ describe('Ticket', function() {
   })
 
   it('should progress and emit', function (done) {
-    t.started(2);
+    t.started();
     t.once('progress', function (progress) {
       assert.equal(progress.pct, 50);
-      assert.equal(progress.current, 1);
       assert.equal(typeof progress.eta, 'string');
       t.once('progress', function (progress) {
         assert.equal(progress.pct, 100);
@@ -64,9 +63,9 @@ describe('Ticket', function() {
         assert.equal(progress.total, 2);
         done();
       });
-      t.progress(2);
+      t.progress(2, 2);
     });
-    t.progress(1);
+    t.progress(1, 2);
   })
   
   
