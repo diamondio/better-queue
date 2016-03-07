@@ -60,7 +60,6 @@ q.push(3)
 
 ## Table of contents
 
-- [Setting Up](#setting-up-the-queue)
 - [Queuing](#queuing)
 - [Task Management](#task-management)
 - [Timing](#timing)
@@ -157,11 +156,29 @@ Now items you push on will be handled first.
 
 ## Task Management
 
-#### Batch Processing
+#### Task ID
 
-Tasks can be identified by `task.id`. If it isn't defined,
-a unique ID is automatically assigned. One thing you can do 
-with Task ID is merge tasks with the same ID.
+Tasks can be given an ID to help identify and track it as it goes through
+the queue.
+
+By default, we look for `task.id` to see if it's a string property,
+otherwise we generate a random ID for the task.
+
+You can pass in an `id` property to options to change this behaviour.
+Here are some examples of how:
+
+```js
+var q = new Queue(fn, {
+  id: 'id',   // Default: task's `id` property
+  id: 'name', // task's `name` property
+  id: function (task, cb) {
+    // Compute the ID
+    cb(null, 'computed_id');
+  }
+})
+```
+
+One thing you can do with Task ID is merge tasks:
 
 ```js
 var counter = new Queue(function (task, cb) {
@@ -181,6 +198,36 @@ counter.push({ id: 'orange', count: 1 });
 //   I have 3 apples.
 //   I have 2 oranges.
 ```
+
+By default, if tasks have the same ID they replace the previous task.
+
+```js
+var counter = new Queue(function (task, cb) {
+  console.log("I have %d %ss.", task.count, task.id);
+  cb();
+})
+counter.push({ id: 'apple', count: 1 });
+counter.push({ id: 'apple', count: 3 });
+counter.push({ id: 'orange', count: 1 });
+counter.push({ id: 'orange', count: 2 });
+// Prints out:
+//   I have 3 apples.
+//   I have 2 oranges.
+```
+
+You can also use the task ID when subscribing to events from Queue.
+
+```js
+var counter = new Queue(fn)
+counter.on('task_finish', function (taskId, result) {
+  // taskId will be 'jim' or 'bob'
+})
+counter.push({ id: 'jim', count: 2 });
+counter.push({ id: 'bob', count: 1 });
+```
+
+
+#### Batch Processing
 
 Your processing function can also be modified to handle multiple
 tasks at the same time. For example:
@@ -330,9 +377,56 @@ q.push(2);
 
 ## Control Flow
 
-There are even more options to control
-- cancel, pause, resume
-- cancelIfRunning
+There are options to control processes while they are running.
+
+You can return an object in your processing function with the functions
+`cancel`, `pause` and `resume`. This will allow operations to pause, resume 
+or cancel while it's running.
+
+```js
+var uploader = new Queue(function (file, cb) {
+  
+  var worker = someLongProcess(file);
+
+  return {
+    cancel: function () {
+      // Cancel the file upload
+    },
+    pause: function () {
+      // Pause the file upload
+    },
+    resume: function () {
+      // Resume the file upload
+    }
+  }
+})
+uploader.push('/path/to/file.pdf');
+uploader.pause();
+uploader.resume();
+```
+
+You can also set `cancelIfRunning` to `true`. This will cancel a running task if
+a task with the same ID is pushed onto the queue.
+
+```js
+var uploader = new Queue(function (file, cb) {
+  var request = someLongProcess(file);
+  return {
+    cancel: function () {
+      request.cancel();
+    }
+  }
+}, {
+  id: 'path',
+  cancelIfRunning: true
+})
+uploader.push({ path: '/path/to/file.pdf' });
+uploader.push({ path: '/path/to/file.pdf' });
+```
+
+In the example above, the first upload process is cancelled and the task is requeued.
+
+Note that if you enable this option in batch mode, it will cancel the entire batch!
 
 
 [back to top](#table-of-contents)

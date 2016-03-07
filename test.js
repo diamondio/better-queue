@@ -80,16 +80,26 @@ var Queue = require('./lib/queue')
 // q.push("task1");
 // q.push("task2");
 
-var ages = new Queue(function (batch, cb) {
-  // Batch:
-  //  {
-  //    
-  //  }
-  console.log(batch);
-  cb();
-}, { batchSize: 3 })
-ages.push({ id: 'steve', age: 21 });
-ages.push({ id: 'john', age: 34 });
-ages.push({ id: 'joe', age: 18 });
-ages.push({ id: 'mary', age: 23 });
+// var ages = new Queue(function (batch, cb) {
+//   // Batch:
+//   //  {
+//   //    
+//   //  }
+//   console.log(batch);
+//   cb();
+// }, { batchSize: 3 })
+// ages.push({ id: 'steve', age: 21 });
+// ages.push({ id: 'john', age: 34 });
+// ages.push({ id: 'joe', age: 18 });
+// ages.push({ id: 'mary', age: 23 });
+
+var counter = new Queue(function (task, cb) { cb() }, { id: 'id' })
+counter.on('task_finish', function (taskId, result) {
+  // taskId will be 'jim' or 'bob'
+  console.log(taskId)
+})
+counter.push({ id: 'jim', count: 2 });
+counter.push({ id: 'jim', count: 2 });
+counter.push({ id: 'bob', count: 1 });
+
 
