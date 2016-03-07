@@ -572,3 +572,47 @@ q.use({
 
 ## Full Documentation
 
+#### new Queue(process, options)
+
+The first argument can be either the process function or the `options` object.
+
+A process function is required, all other options are optional.
+
+- `process` - function to process tasks. Will be run with either one single task (if `batchSize` is 1) or as an array of at most `batchSize` items. The second argument will be a callback `cb(error, result)` that must be called regardless of success or failure.
+
+---
+
+- `filter` - function to filter input. Will be run with `input` whatever was passed to `q.push()`. If you define this function, then you will be expected to call the callback `cb(error, task)`. If an error is sent in the callback then the input is rejected.
+- `merge` - function to merge tasks with the same task ID. Will be run with `oldTask`, `newTask` and a callback `cb(error, mergedTask)`. If you define this function then the callback is expected to be called.
+- `id` - By default, this will be the "id" property of the task (if it's an object.) This can be a string representing which property of the task to be used as the ID. It can also be a function that takes in a task and returns a callback `cb(error, taskId)`.
+- `priority` - function to determine the priority of a task. Takes in a task and returns callback `cb(error, priority)`.
+
+---
+
+- `cancelIfRunning` - If true, when a task with the same ID is running, its worker will be cancelled. Defaults to `false`.
+- `autoResume` - If true, tasks in the store will automatically start processing once it connects to the store. Defaults to `true`.
+- `filo` - If true, tasks will be completed in a first in, last out order. Defaults to `false`.
+- `batchSize` - The number of tasks (at most) that can be processed at once. Defaults to `1`.
+- `concurrent` - Number of workers that can be running at any given time. Defaults to `1`.
+- `processDelay` - Number of milliseconds to delay before starting to popping items off the queue. Defaults to `0`.
+- `maxTimeout` - Number of milliseconds before a task is considered timed out. Defaults to `Infinity`.
+- `idleTimeout` - Number of milliseconds to delay before processing the next batch of items. Defaults to `1`.
+- `maxRetries` - Maximum number of attempts to retry on a failed task. Defaults to `0`.
+- `store` - Represents the options for the initial store. Can be an object containing `{ type: storeType, ... options ... }`, or the store instance itself.
+
+#### Methods on Queue
+
+- `push(task, cb)` - Push a task onto the queue, with an optional callback when it completes. Returns a `Ticket` object.
+- `pause()` - Pauses the queue: tries to pause running tasks and prevents tasks from getting processed until resumed.
+- `resume()` - Resumes the queue and its runnign tasks.
+- `use(store)` - Sets the queue to read from and write to the given store.
+
+#### Events on Queue
+
+- `task_finish` - When a task is completed
+- `task_failed` - When a task fails
+- `task_progress` - When a task progress changes
+- `batch_finish` - When a batch of tasks (or worker) completes
+- `batch_failed` - When a batch of tasks (or worker) fails
+- `batch_progress` - When a batch of tasks (or worker) updates its progress
+
