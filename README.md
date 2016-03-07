@@ -421,6 +421,7 @@ var uploader = new Queue(function (file, cb) {
   cancelIfRunning: true
 })
 uploader.push({ path: '/path/to/file.pdf' });
+// ... Some time later
 uploader.push({ path: '/path/to/file.pdf' });
 ```
 
@@ -500,7 +501,70 @@ the batch.
 
 ## Storage
 
-- store
+
+#### Using a store
+
+For your convenience, we have added compatibility for a few storage options.
+
+By default, we are using an in-memory store that doesn't persist. You can change
+to one of our other built in stores by passing in the `store` option.
+
+```js
+var q = new Queue(fn, {
+  store: {
+    type: "sqlite",
+    path: "/path/to/db"
+  }
+});
+```
+
+The type is one of the types listed below, and the rest of the object is passed
+to the store as options.
+
+
+#### Built-in store
+
+Currently, we support the following stores:
+
+ - memory
+
+Please help us add support for more stores; contributions are welcome!
+
+#### Custom Store
+
+Writing your own store is very easy; you just need to implement a few functions
+then call `queue.use(store)` on your store.
+
+```js
+var q = new Queue(fn, { store: myStore });
+```
+
+or
+
+```js
+q.use(myStore);
+```
+
+Your store needs the following functions:
+```js
+q.use({
+  connect: function (cb) {
+    // Connect to your db
+  },
+  getTask: function (taskId, cb) {
+    // Retrieves a task
+  },
+  putTask: function (taskId, task, priority, cb) {
+    // Save task with given priority
+  },
+  takeFirstN: function (n, cb) {
+    // Removes the first N items (sorted by priority and age)
+  },
+  takeLastN: function (n, cb) {
+    // Removes the last N items (sorted by priority and recency)
+  }
+})
+```
 
 [back to top](#table-of-contents)
 
