@@ -56,16 +56,17 @@ describe('Ticket', function() {
     t.started();
     t.once('progress', function (progress) {
       assert.equal(progress.pct, 50);
+      assert.equal(progress.complete, 1);
+      assert.equal(progress.total, 2);
+      assert.equal(progress.message, 'test');
       assert.equal(typeof progress.eta, 'string');
-      t.once('progress', function (progress) {
-        assert.equal(progress.pct, 100);
-        assert.equal(progress.current, 2);
-        assert.equal(progress.total, 2);
-        done();
-      });
-      t.progress(2, 2);
+      done()
     });
-    t.progress(1, 2);
+    t.progress({
+      complete: 1,
+      total: 2,
+      message: 'test'
+    });
   })
   
   

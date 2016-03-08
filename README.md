@@ -439,15 +439,15 @@ Note that if you enable this option in batch mode, it will cancel the entire bat
 #### Progress/Finish/Fail
 
 The process function will be run in a context with `progress`,
-`finish` and `failed` functions.
+`finishBatch` and `failedBatch` functions.
 
 The example below illustrates how you can use these:
 
 ```js
 var uploader = new Queue(function (file, cb) {
-  this.failed('some_error')
-  this.finish(result)
-  this.progress(bytesUploaded, totalBytes)
+  this.failedBatch('some_error')
+  this.finishBatch(result)
+  this.progressBatch(bytesUploaded, totalBytes, "uploading")
 });
 uploader.on('task_finish', function (taskId, result) {
   // Handle finished result
@@ -469,30 +469,30 @@ uploader.push('/some/file.jpg')
   .on('progress', function (progress) {
     // progress.eta - human readable string estimating time remaining
     // progress.pct - % complete (out of 100)
-    // progress.current - # completed so far
+    // progress.complete - # completed so far
     // progress.total - # for completion
+    // progress.message - status message
   })
 ```
 
 #### Update Status in Batch mode (batchSize > 1)
 
-You can add the array index to the beginning of params to update the status 
-of a task in the batch.
+You can also complete individual tasks in a batch by using `failedTask` and
+`finishTask` functions.
 
 ```js
 var uploader = new Queue(function (files, cb) {
-  this.failed(0, 'some_error') // files[0] has failed with 'some_error'
-  this.finish(1, result)       // files[1] has finished with {result}
-  this.progress(2, 30, 100)    // files[2] is 30% complete
+  this.failedTask(0, 'some_error')         // files[0] has failed with 'some_error'
+  this.finishTask(1, result)               // files[1] has finished with {result}
+  this.progressTask(2, 30, 100, "copying") // files[2] is 30% done, currently copying
 }, { batchSize: 3 });
 uploader.push('/some/file1.jpg')
 uploader.push('/some/file2.jpg')
 uploader.push('/some/file3.jpg')
 ```
 
-Note that you may also use the functions _without_ specifying the array index
-when in batch mode. In that case, the status would apply to all items within
-the batch.
+Note that if you use *-Task and *-Batch functions together, the batch functions will only
+apply to the tasks that have not yet finished/failed.
 
 [back to top](#table-of-contents)
 
@@ -605,14 +605,27 @@ A process function is required, all other options are optional.
 - `push(task, cb)` - Push a task onto the queue, with an optional callback when it completes. Returns a `Ticket` object.
 - `pause()` - Pauses the queue: tries to pause running tasks and prevents tasks from getting processed until resumed.
 - `resume()` - Resumes the queue and its runnign tasks.
+- `destroy()` - Destroys the queue: closes the store, tries to clean up.
 - `use(store)` - Sets the queue to read from and write to the given store.
 
 #### Events on Queue
 
+- `task_queued` - When a task is queued
+- `task_accepted` - When a task is accepted
+- `task_started` - When a task begins processing
 - `task_finish` - When a task is completed
 - `task_failed` - When a task fails
 - `task_progress` - When a task progress changes
 - `batch_finish` - When a batch of tasks (or worker) completes
 - `batch_failed` - When a batch of tasks (or worker) fails
 - `batch_progress` - When a batch of tasks (or worker) updates its progress
+
+#### Events on Ticket
+
+- `accept` - When the corresponding task is accepted (has passed filter)
+- `queued` - When the corresponding task is queued (and saved into the store)
+- `started` - When the corresponding task is started
+- `progress` - When the corresponding task progress changes
+- `finish` - When the corresponding task completes
+- `failed` - When the corresponding task fails
 
