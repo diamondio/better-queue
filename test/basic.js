@@ -29,6 +29,36 @@ describe('Basic Queue', function() {
     })
   });
 
+  it('should run fifo', function (done) {
+    var finished = 0;
+    var queued = 0;
+    var q = new Queue(function (num, cb) { cb() })
+    q.on('task_finish', function () {
+      if (finished >= 3) {
+        done();
+      }
+    })
+    q.on('task_queued', function () {
+      queued++;
+      if (queued >= 3) {
+        q.resume();
+      }
+    })
+    q.pause();
+    q.push(1, function (err, r) {
+      assert.equal(finished, 0);
+      finished++;
+    })
+    q.push(2, function (err, r) {
+      assert.equal(finished, 1);
+      finished++;
+    })
+    q.push(3, function (err, r) {
+      assert.equal(finished, 2);
+      finished++;
+    })
+  })
+
   it('should prioritize', function (done) {
     var q = new Queue(function (num, cb) { cb() }, {
       priority: function (n, cb) {
@@ -82,16 +112,14 @@ describe('Basic Queue', function() {
     q.push(1, function (err, r) {
       assert.equal(finished, 2);
       finished++;
-    }).on('queued', function () {
-      q.push(2, function (err, r) {
-        assert.equal(finished, 1);
-        finished++;
-      }).on('queued', function () {
-        q.push(3, function (err, r) {
-          assert.equal(finished, 0);
-          finished++;
-        })
-      })
+    })
+    q.push(2, function (err, r) {
+      assert.equal(finished, 1);
+      finished++;
+    })
+    q.push(3, function (err, r) {
+      assert.equal(finished, 0);
+      finished++;
     })
   })
 
@@ -120,6 +148,14 @@ describe('Basic Queue', function() {
       assert.ok(emptied);
       done();
     });
+    var queued = 0;
+    q.on('task_queued', function () {
+      queued++;
+      if (queued >= 3) {
+        q.resume();
+      }
+    })
+    q.pause();
     q.push(1)
     q.push(2)
     q.push(3)

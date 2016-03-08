@@ -93,7 +93,7 @@ var Queue = require('./lib/queue')
 // ages.push({ id: 'joe', age: 18 });
 // ages.push({ id: 'mary', age: 23 });
 
-var counter = new Queue(function (task, cb) { cb() }, { id: 'id' })
+var counter = new Queue(function (task, cb) { cb() }, { id: 'id', store: { type: 'sqlite', path: './abc.db' } })
 counter.on('task_finish', function (taskId, result) {
   // taskId will be 'jim' or 'bob'
   console.log(taskId)
