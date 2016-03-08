@@ -16,6 +16,17 @@ describe('Basic Queue', function() {
     })
   });
 
+  it('should catch thrown errors', function (done) {
+    var q = new Queue(function (n, cb) {
+      throw new Error("failed");
+    })
+    q.on('task_failed', function (taskId, msg) {
+      assert.equal(msg, "failed");
+      done();
+    })
+    q.push(1)
+  });
+
   it('should fail', function (done) {
     var q = new Queue(function (n, cb) {
       cb('nope')
