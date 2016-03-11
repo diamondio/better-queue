@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/leanderlee/better-queue.git"
+    "url": "https://github.com/diamondio/better-queue.git"
   },
   "keywords": [
     "persistent",
@@ -27,12 +27,12 @@
     "best",
     "better"
   ],
-  "author": "Leander Lee <me@leander.ca>",
+  "author": "Diamond Inc. <ops@diamond.io>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/leanderlee/better-queue/issues"
+    "url": "https://github.com/diamondio/better-queue/issues"
   },
-  "homepage": "https://github.com/leanderlee/better-queue",
+  "homepage": "https://github.com/diamondio/better-queue",
   "devDependencies": {
     "mocha": "^2.3.4"
   },
