@@ -2,10 +2,10 @@
 
 [![npm package](https://nodei.co/npm/better-queue.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/better-queue/)
 
-[![Build status](https://img.shields.io/travis/leanderlee/better-queue.svg?style=flat-square)](https://travis-ci.org/leanderlee/better-queue)
-[![Dependency Status](https://img.shields.io/david/leanderlee/better-queue.svg?style=flat-square)](https://david-dm.org/leanderlee/better-queue)
+[![Build status](https://img.shields.io/travis/diamondio/better-queue.svg?style=flat-square)](https://travis-ci.org/diamondio/better-queue)
+[![Dependency Status](https://img.shields.io/david/diamondio/better-queue.svg?style=flat-square)](https://david-dm.org/diamondio/better-queue)
 [![Known Vulnerabilities](https://snyk.io/test/npm/better-queue/badge.svg?style=flat-square)](https://snyk.io/test/npm/better-queue)
-[![Gitter](https://img.shields.io/badge/gitter-join_chat-blue.svg?style=flat-square)](https://gitter.im/leanderlee/better-queue?utm_source=badge)
+[![Gitter](https://img.shields.io/badge/gitter-join_chat-blue.svg?style=flat-square)](https://gitter.im/diamondio/better-queue?utm_source=badge)
 
 
 ## Super simple to use
