@@ -102,20 +102,22 @@ var Queue = require('./lib/queue')
 // counter.push({ id: 'jim', count: 2 });
 // counter.push({ id: 'bob', count: 1 });
 
-var q = new Queue(function (b, cb) {
-  console.log("Pushed %s.", b.join(', '));
-  cb();
-}, {
-  batchSize: 5,
-  batchDelay: 10
-})
-
-q.push(1);
-q.push(2);
-q.push(3);
-q.push(4);
-q.push(5);
-q.push(6);
-q.push(7);
-
+// var q = new Queue(function (b, cb) {
+//   console.log("Pushed %s.", b.join(', '));
+//   cb();
+// }, { batchSize: 3, batchDelay: 950 })
+// q.push(1);
+// q.push(2);
+// q.push(3);
+// q.push(4);
+// setTimeout(function () {
+//   q.push(5);
+//   q.push(6);
+//   setTimeout(function () {
+//     q.push(7);
+//     q.push(8);
+//     q.push(9);
+//     q.push(10);
+//   }, 1000)
+// }, 400)
 
