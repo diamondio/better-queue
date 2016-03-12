@@ -93,13 +93,29 @@ var Queue = require('./lib/queue')
 // ages.push({ id: 'joe', age: 18 });
 // ages.push({ id: 'mary', age: 23 });
 
-var counter = new Queue(function (task, cb) { cb() }, { id: 'id', store: { type: 'sqlite', path: './abc.db' } })
-counter.on('task_finish', function (taskId, result) {
-  // taskId will be 'jim' or 'bob'
-  console.log(taskId)
+// var counter = new Queue(function (task, cb) { cb() }, { id: 'id', store: { type: 'sqlite', path: './abc.db' } })
+// counter.on('task_finish', function (taskId, result) {
+//   // taskId will be 'jim' or 'bob'
+//   console.log(taskId)
+// })
+// counter.push({ id: 'jim', count: 2 });
+// counter.push({ id: 'jim', count: 2 });
+// counter.push({ id: 'bob', count: 1 });
+
+var q = new Queue(function (b, cb) {
+  console.log("Pushed %s.", b.join(', '));
+  cb();
+}, {
+  batchSize: 5,
+  batchDelay: 10
 })
-counter.push({ id: 'jim', count: 2 });
-counter.push({ id: 'jim', count: 2 });
-counter.push({ id: 'bob', count: 1 });
+
+q.push(1);
+q.push(2);
+q.push(3);
+q.push(4);
+q.push(5);
+q.push(6);
+q.push(7);
 
 

@@ -52,7 +52,7 @@ describe('Store Usage', function() {
   it('should queue length', function (done) {
     var queued = false;
     var s = {
-      connect: function (cb) { cb(0, 5) },
+      connect: function (cb) { cb(null, 5) },
       getTask: function (taskId, cb) { cb() },
       putTask: function (taskId, task, priority, cb) { cb() },
       takeFirstN: function (n, cb) { cb(null, { 'task-id': queued ? 2 : 1 }) },
@@ -60,14 +60,14 @@ describe('Store Usage', function() {
     }
     var q = new Queue(function (n, cb) {
       if (n === 2) {
-        assert.equal(q.length, 4);
+        assert.equal(q.length, 5);
         done();
       }
       cb();
-    }, { store: s })
+    }, { store: s, autoResume: false })
     q.push(1).on('queued', function (e) {
       queued = true;
-      assert.equal(q.length, 5);
+      assert.equal(q.length, 6);
     })
   })
 

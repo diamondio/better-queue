@@ -584,17 +584,17 @@ A process function is required, all other options are optional.
 
 - `filter` - function to filter input. Will be run with `input` whatever was passed to `q.push()`. If you define this function, then you will be expected to call the callback `cb(error, task)`. If an error is sent in the callback then the input is rejected.
 - `merge` - function to merge tasks with the same task ID. Will be run with `oldTask`, `newTask` and a callback `cb(error, mergedTask)`. If you define this function then the callback is expected to be called.
-- `id` - By default, this will be the "id" property of the task (if it's an object.) This can be a string representing which property of the task to be used as the ID. It can also be a function that takes in a task and returns a callback `cb(error, taskId)`.
 - `priority` - function to determine the priority of a task. Takes in a task and returns callback `cb(error, priority)`.
 
 ---
 
+- `id` - The property to use as the task ID. This can be a string or a function (for more complicated IDs). The function `(task, cb)` and must call the callback with `cb(error, taskId)`.
 - `cancelIfRunning` - If true, when a task with the same ID is running, its worker will be cancelled. Defaults to `false`.
 - `autoResume` - If true, tasks in the store will automatically start processing once it connects to the store. Defaults to `true`.
 - `filo` - If true, tasks will be completed in a first in, last out order. Defaults to `false`.
 - `batchSize` - The number of tasks (at most) that can be processed at once. Defaults to `1`.
-- `concurrent` - Number of workers that can be running at any given time. Defaults to `1`.
 - `batchDelay` - Number of milliseconds to delay before starting to popping items off the queue. Defaults to `0`.
+- `concurrent` - Number of workers that can be running at any given time. Defaults to `1`.
 - `maxTimeout` - Number of milliseconds before a task is considered timed out. Defaults to `Infinity`.
 - `afterProcessDelay` - Number of milliseconds to delay before processing the next batch of items. Defaults to `1`.
 - `maxRetries` - Maximum number of attempts to retry on a failed task. Defaults to `0`.

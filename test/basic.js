@@ -149,6 +149,43 @@ describe('Basic Queue', function() {
     })
   })
 
+  it('should batch delay', function (done) {
+    var batches = 0;
+    var q = new Queue(function (batch, cb) {
+      batches++;
+      if (batches === 1) {
+        assert.equal(batch.length, 2);
+        return cb();
+      }
+      if (batches === 2) {
+        assert.equal(batch.length, 1);
+        cb();
+        return done();
+      }
+    }, { batchSize: 2, batchDelay: 2 });
+    q.push(1);
+    q.push(2);
+    q.push(3);
+  })
+
+  it('should batch 2', function (done) {
+    var finished = 0;
+    var q = new Queue(function (batch, cb) {
+      finished++;
+      assert.equal(batch.length, 1);
+      if (finished >= 2) {
+        done();
+      }
+      cb();
+    }, { batchSize: 2, batchDelay: 1 });
+    q.push(1)
+      .on('queued', function () {
+        setTimeout(function () {
+          q.push(2);
+        }, 2)
+      })
+  })
+
   it('should drain and empty', function (done) {
     var emptied = false;
     var q = new Queue(function (n, cb) { cb() })

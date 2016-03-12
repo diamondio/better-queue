@@ -127,6 +127,7 @@ describe('Complex Queue', function() {
         cb();
       }
     }, {
+      id: 'id',
       merge: function (a, b, cb) {
         a.x += b.x;
         cb(null, a);
@@ -250,7 +251,7 @@ describe('Complex Queue', function() {
           cancelled = true;
         }
       }
-    }, { cancelIfRunning: true })
+    }, { id: 'id', cancelIfRunning: true })
     q.push({ id: 1 })
       .on('started', function () {
         q.push({ id: 2 });
