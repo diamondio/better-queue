@@ -354,19 +354,19 @@ behaviour of a timed cargo.
 var q = new Queue(function (batch, cb) {
   // Batch [1,2] will process after 2s.
   cb();
-}, { batchSize: 5, processDelay: 2000 })
+}, { batchSize: 5, batchDelay: 2000 })
 q.push(1);
 setTimeout(function () {
   q.push(2);
 }, 1000)
 ```
 
-You can also set `idleTimeout`, which will delay processing between tasks.
+You can also set `afterProcessDelay`, which will delay processing between tasks.
 
 ```js
 var q = new Queue(function (task, cb) {
   cb(); // Will wait 1 second before taking the next task
-}, { idleTimeout: 1000 })
+}, { afterProcessDelay: 1000 })
 q.push(1);
 q.push(2);
 ```
@@ -594,10 +594,12 @@ A process function is required, all other options are optional.
 - `filo` - If true, tasks will be completed in a first in, last out order. Defaults to `false`.
 - `batchSize` - The number of tasks (at most) that can be processed at once. Defaults to `1`.
 - `concurrent` - Number of workers that can be running at any given time. Defaults to `1`.
-- `processDelay` - Number of milliseconds to delay before starting to popping items off the queue. Defaults to `0`.
+- `batchDelay` - Number of milliseconds to delay before starting to popping items off the queue. Defaults to `0`.
 - `maxTimeout` - Number of milliseconds before a task is considered timed out. Defaults to `Infinity`.
-- `idleTimeout` - Number of milliseconds to delay before processing the next batch of items. Defaults to `1`.
+- `afterProcessDelay` - Number of milliseconds to delay before processing the next batch of items. Defaults to `1`.
 - `maxRetries` - Maximum number of attempts to retry on a failed task. Defaults to `0`.
+- `storeMaxRetries` - Maximum number of attempts before giving up on the store. Defaults to `Infinity`.
+- `storeRetryTimeout` - Number of milliseconds to delay before trying to connect to the store again. Defaults to `1000`.
 - `store` - Represents the options for the initial store. Can be an object containing `{ type: storeType, ... options ... }`, or the store instance itself.
 
 #### Methods on Queue

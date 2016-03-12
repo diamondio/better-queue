@@ -260,7 +260,5 @@ describe('Complex Queue', function() {
       });
   })
   
-  // TODO: Test progress
-  // TODO: Test stores
 
 })
