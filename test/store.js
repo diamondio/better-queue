@@ -71,6 +71,18 @@ describe('Store Usage', function() {
     })
   })
 
+  it('should fail if there is no length on connect', function (done) {
+    var queued = false;
+    var s = {
+      connect: function (cb) { cb() }
+    }
+    try {
+      var q = new Queue(function (n, cb) {}, { store: s })
+    } catch (e) {
+      done();
+    }
+  })
+
   // TODO: Test progress
   // TODO: Test the actual stores
 
