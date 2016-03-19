@@ -103,9 +103,9 @@ var Queue = require('./lib/queue')
 // counter.push({ id: 'bob', count: 1 });
 
 // var q = new Queue(function (b, cb) {
-//   console.log("Pushed %s.", b.join(', '));
+//   console.log("Pushed %s.", b);
 //   cb();
-// }, { batchSize: 3, batchDelay: 950 })
+// }, { batchDelay: 50, afterProcessDelay: 1000 })
 // q.push(1);
 // q.push(2);
 // q.push(3);
