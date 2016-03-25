@@ -103,6 +103,21 @@ var Queue = require('./lib/queue')
 // counter.push({ id: 'bob', count: 1 });
 
 // var q = new Queue(function (b, cb) {
+//   console.log("starting");
+//   setTimeout(function () {
+//     console.log('done')
+//     cb()
+//   }, 95)
+// }, { maxTimeout: 100 })
+// q.on('task_failed', function (err) {
+//   console.log('timeout', err)
+// })
+// q.on('task_finish', function (res) {
+//   console.log('finished!', res)
+// })
+// q.push(1)
+
+// var q = new Queue(function (b, cb) {
 //   console.log("Pushed %s.", b);
 //   cb();
 // }, { batchDelay: 50, afterProcessDelay: 1000 })

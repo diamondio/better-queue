@@ -285,4 +285,24 @@ describe('Basic Queue', function() {
     q.resume();
   })
 
+  it('should timeout and fail', function (done) {
+    var tries = 0;
+    var q = new Queue(function (n, cb) {
+      tries++;
+      setTimeout(function () {
+        cb(null, 'done!')
+      }, 3)
+    }, { maxTimeout: 1, maxRetries: 2 })
+    q.push(1)
+      .on('finish', function (result) {
+        assert.ok(false)
+      })
+      .on('failed', function (err) {
+        assert.equal(tries, 2);
+        setTimeout(function () {
+          done();
+        }, 5)
+      })
+  })
+
 })
