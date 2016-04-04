@@ -14,7 +14,6 @@ describe('Stats', function() {
     })
     q.on('task_finish', function (id, result, stat) {
       completed++;
-      assert.ok(stat.elapsed > 0)
       elapsedTotals += stat.elapsed;
     })
     q.on('drain', function () {
