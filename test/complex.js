@@ -198,17 +198,26 @@ describe('Complex Queue', function() {
   
   it('should respect id property (function)', function (done) {
     var finished = 0;
-    var q = new Queue(function (n, cb) { cb(null, n) }, {
+    var q = new Queue(function (n, cb) {
+      console.log('processing')
+      cb(null, n)
+    }, {
+      batchDelay: 3,
       id: function (n, cb) {
         cb(null, n % 2 === 0 ? 'even' : 'odd');
       },
       merge: function (a, b, cb) {
+        console.log('merged', a, b)
         cb(null, a+b);
       }
     })
     var finished = 0;
     var queued = 0;
+    q.on('task_queued', function (taskId, r) {
+      console.log('queued', taskId)
+    })
     q.on('task_finish', function (taskId, r) {
+      console.log('inc finish', taskId, r)
       finished++;
       if (taskId === 'odd') {
         assert.equal(r, 9);
@@ -216,17 +225,11 @@ describe('Complex Queue', function() {
       if (taskId === 'even') {
         assert.equal(r, 6);
       }
+      console.log(r, 'finished', finished)
       if (finished >= 2) {
         done();
       }
     })
-    q.on('task_queued', function (taskId, r) {
-      queued++;
-      if (queued >= 2) {
-        q.resume();
-      }
-    })
-    q.pause();
     q.push(1);
     q.push(2);
     q.push(3);
