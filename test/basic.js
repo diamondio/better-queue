@@ -305,4 +305,29 @@ describe('Basic Queue', function() {
       })
   })
 
+  it('should cancel while running and in queue', function (done) {
+    var q = new Queue(function (task, cb) {
+      assert.ok(task.n, 2)
+      setTimeout(function () {
+        q.cancel(1);
+      }, 1)
+      return {
+        cancel: function () {
+          done();
+        }
+      }
+    }, {
+      id: 'id',
+      merge: function (a,b) {
+        assert.ok(false);
+      }
+    })
+    q.push({ id: 1, n: 1 })
+      .on('queued', function () {
+        q.cancel(1, function () {
+          q.push({ id: 1, n: 2 });
+        })
+      });
+  })
+
 })
