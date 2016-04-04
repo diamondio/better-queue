@@ -428,6 +428,12 @@ uploader.push({ path: '/path/to/file.pdf' });
 
 In the example above, the first upload process is cancelled and the task is requeued.
 
+You can also call `.cancel(taskId)` to cancel and unqueue the task.
+
+```js
+uploader.cancel('/path/to/file.pdf');
+```
+
 Note that if you enable this option in batch mode, it will cancel the entire batch!
 
 
