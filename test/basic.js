@@ -16,12 +16,22 @@ describe('Basic Queue', function() {
     })
   });
 
-  it('should catch thrown errors', function (done) {
+  it('should fail task if failTaskOnProcessException is true', function (done) {
     var q = new Queue(function (n, cb) {
       throw new Error("failed");
     })
     q.on('task_failed', function (taskId, msg) {
       assert.equal(msg, "failed");
+      done();
+    })
+    q.push(1)
+  });
+
+  it('should emit an error if failTaskOnProcessException is false', function (done) {
+    var q = new Queue(function (n, cb) {
+      throw new Error("failed");
+    }, { failTaskOnProcessException: false })
+    q.on('error', function () {
       done();
     })
     q.push(1)
@@ -328,6 +338,22 @@ describe('Basic Queue', function() {
           q.push({ id: 1, n: 2 });
         })
       });
+  })
+
+  it('should stop if precondition fails', function (done) {
+    var retries = 0;
+    var q = new Queue(function () {
+      assert.equal(retries, 2);
+      done();
+    }, {
+      precondition: function (cb) {
+        console.log('called precondtiion');
+        retries++;
+        cb(null, retries === 2)
+      },
+      preconditionRetryTimeout: 1
+    })
+    q.push(1);
   })
 
 })

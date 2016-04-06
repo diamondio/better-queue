@@ -38,34 +38,23 @@ npm install --save better-queue
 ```js
 var Queue = require('better-queue');
 
-var options = {
-  batchSize: 3,
-  maxTimeout: 1000,
-  concurrent: 2,
-  maxRetries: 3,
-  store: {
-    type: "sqlite",
-    path: "/path/to/db"
-  },
-  // ... and lots more!
-}
+var q = new Queue(function (input, cb) {
+  
+  // Some processing here ...
 
-var q = new Queue(function (n, cb) {
-  cb(null, n);
-}, options) // Options are optional
+  cb(null, result);
+})
 
 q.push(1)
-q.push(2)
-q.push(3)
+q.push({ x: 1 })
 ```
 
 ## Table of contents
 
 - [Queuing](#queuing)
 - [Task Management](#task-management)
-- [Timing](#timing)
-- [Control Flow](#control-flow)
-- [Status Updates](#status-updates)
+- [Queue Management](#queue-management)
+- [Advanced](#advanced)
 - [Storage](#storage)
 - [Full Documentation](#full-documentation)
 
@@ -319,6 +308,12 @@ If `filo` is set to `true` in the example above, then Joe and Mary
 would swap order.
 
 
+[back to top](#table-of-contents)
+
+---
+
+## Queue Management
+
 #### Retry
 
 You can set tasks to retry `maxRetries` times if they fail. By default,
@@ -329,11 +324,7 @@ var q = new Queue(fn, { maxRetries: 10 })
 ```
 
 
-[back to top](#table-of-contents)
-
----
-
-## Timing
+#### Timing
 
 You can configure the queue to have a `maxTimeout`.
 
@@ -372,11 +363,33 @@ q.push(1);
 q.push(2);
 ```
 
-[back to top](#table-of-contents)
+#### Precondition
 
----
+You can define a function called `precondition` that checks that it's ok to process
+the next batch. If the preconditions fail, it will keep calling this function until
+it passes again.
 
-## Control Flow
+```js
+var q = new Queue(function (batch, cb) {
+
+  // Do something that requires internet
+
+}, {
+  precondition: function (cb) {
+    isOnline(function (err, ok) {
+      if (ok) {
+        cb(null, true);
+      } else {
+        cb(null, false);
+      }
+    })
+  },
+  preconditionRetryTimeout: 10*1000 // If we go offline, retry every 10s
+})
+```
+
+
+#### Pause/Resume
 
 There are options to control processes while they are running.
 
@@ -405,6 +418,8 @@ uploader.push('/path/to/file.pdf');
 uploader.pause();
 uploader.resume();
 ```
+
+#### Cancel/Abort
 
 You can also set `cancelIfRunning` to `true`. This will cancel a running task if
 a task with the same ID is pushed onto the queue.
@@ -441,9 +456,9 @@ Note that if you enable this option in batch mode, it will cancel the entire bat
 
 ---
 
-## Status Updates
+## Advanced
 
-#### Progress/Finish/Fail
+#### Updating Task Status
 
 The process function will be run in a context with `progress`,
 `finishBatch` and `failedBatch` functions.
@@ -609,12 +624,14 @@ A process function is required, all other options are optional.
 - `filter` - function to filter input. Will be run with `input` whatever was passed to `q.push()`. If you define this function, then you will be expected to call the callback `cb(error, task)`. If an error is sent in the callback then the input is rejected.
 - `merge` - function to merge tasks with the same task ID. Will be run with `oldTask`, `newTask` and a callback `cb(error, mergedTask)`. If you define this function then the callback is expected to be called.
 - `priority` - function to determine the priority of a task. Takes in a task and returns callback `cb(error, priority)`.
+- `precondition` - function that runs a check before processing to ensure it can process the next batch. Takes a callback `cb(error, passOrFail)`.
 
 ---
 
 - `id` - The property to use as the task ID. This can be a string or a function (for more complicated IDs). The function `(task, cb)` and must call the callback with `cb(error, taskId)`.
 - `cancelIfRunning` - If true, when a task with the same ID is running, its worker will be cancelled. Defaults to `false`.
 - `autoResume` - If true, tasks in the store will automatically start processing once it connects to the store. Defaults to `true`.
+- `failTaskOnProcessException` - If true, when the process function throws an error the batch fails. Defaults to `true`.
 - `filo` - If true, tasks will be completed in a first in, last out order. Defaults to `false`.
 - `batchSize` - The number of tasks (at most) that can be processed at once. Defaults to `1`.
 - `batchDelay` - Number of milliseconds to delay before starting to popping items off the queue. Defaults to `0`.
@@ -624,6 +641,7 @@ A process function is required, all other options are optional.
 - `maxRetries` - Maximum number of attempts to retry on a failed task. Defaults to `0`.
 - `storeMaxRetries` - Maximum number of attempts before giving up on the store. Defaults to `Infinity`.
 - `storeRetryTimeout` - Number of milliseconds to delay before trying to connect to the store again. Defaults to `1000`.
+- `preconditionRetryTimeout` - Number of milliseconds to delay before checking the precondition function again. Defaults to `1000`.
 - `store` - Represents the options for the initial store. Can be an object containing `{ type: storeType, ... options ... }`, or the store instance itself.
 
 #### Methods on Queue
