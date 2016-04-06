@@ -136,3 +136,18 @@ var Queue = require('./lib/queue')
 //   }, 1000)
 // }, 400)
 
+// var isOk = false;
+// setTimeout(function () {
+//   isOk = true;
+// }, 5000)
+// var q = new Queue(function (b, cb) {
+//   console.log("Pushed %s.", b);
+//   cb();
+// }, {
+//   precondition: function (cb) {
+//     cb(null, isOk)
+//   }
+// })
+// q.push(1);
+// q.push(2);
+// q.push(3);
