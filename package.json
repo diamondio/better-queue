@@ -14,18 +14,11 @@
     "url": "https://github.com/diamondio/better-queue.git"
   },
   "keywords": [
-    "persistent",
-    "network",
-    "async",
-    "control",
-    "flow",
-    "pipeline",
-    "timeout",
-    "priority",
-    "cargo",
     "queue",
-    "best",
-    "better"
+    "cargo",
+    "async",
+    "timeout",
+    "priority"
   ],
   "author": "Diamond Inc. <ops@diamond.io>",
   "license": "MIT",
