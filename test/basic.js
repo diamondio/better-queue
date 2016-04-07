@@ -219,6 +219,19 @@ describe('Basic Queue', function() {
     q.push(3)
   })
 
+  it('should drain only once the task is complete', function (done) {
+    var finished_task = false;
+    var q = new Queue(function (n, cb) {
+        finished_task = true;
+        cb();
+    }, { concurrent: 2 });
+    q.on('drain', function () {
+      assert.ok(finished_task);
+      done();
+    });
+    q.push(1);
+  });
+
   it('should queue 50 things', function (done) {
     var q = new Queue(function (n, cb) {
       cb(null, n+1);
@@ -235,7 +248,7 @@ describe('Basic Queue', function() {
         })
       })(i)
     }
-  })
+  });
 
   it('should concurrently handle tasks', function (done) {
     var concurrent = 0;
