@@ -360,7 +360,6 @@ describe('Basic Queue', function() {
       done();
     }, {
       precondition: function (cb) {
-        console.log('called precondtiion');
         retries++;
         cb(null, retries === 2)
       },
