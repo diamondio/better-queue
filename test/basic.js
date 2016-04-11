@@ -368,4 +368,18 @@ describe('Basic Queue', function() {
     q.push(1);
   })
 
+  it('should call cb on throw', function (done) {
+    var called = false;
+    var q = new Queue(function (task, cb) {
+      throw new Error('lol u wot m8? u wot?');
+    })
+    q.push(1, function (err) {
+      called = true;
+      assert.ok(err);
+    });
+    q.on('drain', function () {
+      assert.ok(called);
+      done();
+    });
+  })
 })
