@@ -371,7 +371,7 @@ describe('Basic Queue', function() {
   it('should call cb on throw', function (done) {
     var called = false;
     var q = new Queue(function (task, cb) {
-      throw new Error('lol u wot m8? u wot?');
+      throw new Error('fail');
     })
     q.push(1, function (err) {
       called = true;
@@ -382,4 +382,20 @@ describe('Basic Queue', function() {
       done();
     });
   })
+
+  it('should respect batchDelayTimeout', function (done) {
+    var q = new Queue(function (arr) {
+      assert.equal(arr.length, 2);
+      done();
+    }, {
+      batchSize: 3,
+      batchDelay: Infinity,
+      batchDelayTimeout: 5
+    })
+    q.push(1);
+    setTimeout(function () {
+      q.push(2);
+    }, 1)
+  })
+
 })

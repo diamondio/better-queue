@@ -363,6 +363,20 @@ q.push(1);
 q.push(2);
 ```
 
+Instead of just the `batchDelay`, you can add a `batchDelayTimeout`, which is for firing off a batch if it hasn't had any new tasks pushed to the queue in the `batchDelayTimeout` time (in milliseconds.)
+
+```js
+var q = new Queue(fn, {
+  batchSize: 50,
+  batchDelay: 5000,
+  batchDelayTimeout: 1000
+})
+q.push(1);
+q.push(2);
+```
+
+In the example above, the queue will wait for 50 items to fill up in 5s or process the queue if no new tasks were added in 1s.
+
 #### Precondition
 
 You can define a function called `precondition` that checks that it's ok to process
@@ -635,6 +649,7 @@ A process function is required, all other options are optional.
 - `filo` - If true, tasks will be completed in a first in, last out order. Defaults to `false`.
 - `batchSize` - The number of tasks (at most) that can be processed at once. Defaults to `1`.
 - `batchDelay` - Number of milliseconds to delay before starting to popping items off the queue. Defaults to `0`.
+- `batchDelayTimeout` - Number of milliseconds to wait for a new task to arrive before firing off the batch. Defaults to `Infinity`.
 - `concurrent` - Number of workers that can be running at any given time. Defaults to `1`.
 - `maxTimeout` - Number of milliseconds before a task is considered timed out. Defaults to `Infinity`.
 - `afterProcessDelay` - Number of milliseconds to delay before processing the next batch of items. Defaults to `1`.
