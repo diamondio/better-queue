@@ -398,4 +398,22 @@ describe('Basic Queue', function() {
     }, 1)
   })
 
+  it('should merge but not batch until the delay has happened', function (done) {
+    var running = false;
+    var q = new Queue(function (arr) {
+      running = true;
+    }, {
+      batchSize: 2,
+      batchDelay: Infinity,
+      id: 'id'
+    })
+    setTimeout(function () {
+      q.push({ id: 'a', x: 1 });
+      q.push({ id: 'a', x: 2 });
+    }, 1)
+    setTimeout(function () {
+      assert.ok(!running);
+      done();
+    }, 10)
+  })
 })
