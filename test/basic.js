@@ -278,7 +278,7 @@ describe('Basic Queue', function() {
     q.push(2, finish);
     q.push(3, finish);
   })
-  
+
   it('should pause and resume', function (done) {
     var running = false;
     var q = new Queue(function (n, cb) {
@@ -415,5 +415,21 @@ describe('Basic Queue', function() {
       assert.ok(!running);
       done();
     }, 10)
+  })
+
+  it('merge batches should call all push callbacks', function (done) {
+    var count = 0
+    function finish() {
+      count++
+      if (count === 2) done()
+    }
+    var q = new Queue(function (arr, cb) {
+      cb()
+    }, {
+      batchSize: 2,
+      id: 'id'
+    })
+    q.push({ id: 'a', x: 1 }, finish)
+    q.push({ id: 'a', x: 2 }, finish)
   })
 })
