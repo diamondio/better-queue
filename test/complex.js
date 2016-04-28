@@ -268,7 +268,6 @@ describe('Complex Queue', function() {
       cb();
       setTimeout(function () {
         s.getRunningTasks(function (err, tasks) {
-          console.log(err, tasks)
           assert.ok(!Object.keys(tasks).length)
           fs.unlinkSync(testDB);
           done();
