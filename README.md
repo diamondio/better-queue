@@ -317,10 +317,11 @@ would swap order.
 #### Retry
 
 You can set tasks to retry `maxRetries` times if they fail. By default,
-tasks will fail (and will not retry.)
+tasks will fail (and will not retry.) Optionally, you can set a `retryDelay`
+to wait a little while before retrying.
 
 ```js
-var q = new Queue(fn, { maxRetries: 10 })
+var q = new Queue(fn, { maxRetries: 10, retryDelay: 1000 })
 ```
 
 
@@ -654,6 +655,7 @@ A process function is required, all other options are optional.
 - `maxTimeout` - Number of milliseconds before a task is considered timed out. Defaults to `Infinity`.
 - `afterProcessDelay` - Number of milliseconds to delay before processing the next batch of items. Defaults to `1`.
 - `maxRetries` - Maximum number of attempts to retry on a failed task. Defaults to `0`.
+- `retryDelay` - Number of milliseconds before retrying. Defaults to `0`.
 - `storeMaxRetries` - Maximum number of attempts before giving up on the store. Defaults to `Infinity`.
 - `storeRetryTimeout` - Number of milliseconds to delay before trying to connect to the store again. Defaults to `1000`.
 - `preconditionRetryTimeout` - Number of milliseconds to delay before checking the precondition function again. Defaults to `1000`.
