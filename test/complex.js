@@ -1,6 +1,8 @@
+var fs = require('fs');
 var assert = require('assert');
 var Queue = require('../lib/queue');
 var MemoryStore = require('../lib/stores/memory');
+var SQLiteStore = require('../lib/stores/sqlite');
 
 describe('Complex Queue', function() {
 
@@ -257,6 +259,35 @@ describe('Complex Queue', function() {
           q.push({ id: 1 });
         }, 1)
       });
+  })
+
+  it('should release lock after running (sqlite)', function (done) {
+    var testDB = __dirname + '/test-sqlite.db';
+    var s = new SQLiteStore({ path: testDB });
+    var q = new Queue(function (n, cb) {
+      cb();
+      setTimeout(function () {
+        s.getRunningTasks(function (err, tasks) {
+          console.log(err, tasks)
+          assert.ok(!Object.keys(tasks).length)
+          fs.unlinkSync(testDB);
+          done();
+        })
+      }, 1)
+    }, { store: s })
+    q.push(1);
+  })
+
+  it('should resume running task (sqlite)', function (done) {
+    var testDB = __dirname + '/test-sqlite.db';
+    var s = new SQLiteStore({ path: testDB });
+    var q1 = new Queue(function () {
+      var q2 = new Queue(function () {
+        fs.unlinkSync(testDB);
+        done();
+      }, { store: s })
+    }, { store: s })
+    q1.push(1);
   })
   
 
