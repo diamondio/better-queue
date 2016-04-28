@@ -289,5 +289,21 @@ describe('Complex Queue', function() {
     q1.push(1);
   })
   
+  it('failed task should not stack overflow', function (done) {
+    var count = 0;
+    var q = new Queue(function (n, cb) {
+      count++
+      if (count > 2000) {
+        cb();
+        done();
+      } else {
+        cb('fail');
+      }
+    }, {
+      maxRetries: Infinity
+    })
+    q.push(1);
+  })
+
 
 })
