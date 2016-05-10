@@ -432,4 +432,29 @@ describe('Basic Queue', function() {
     q.push({ id: 'a', x: 1 }, finish)
     q.push({ id: 'a', x: 2 }, finish)
   })
+
+  it('cancel should not retry', function (done) {
+    var count = 0;
+    var q = new Queue(function (n, cb) {
+      count++;
+      if (count === 2) {
+        q.cancel('a', function () {
+          cb('failed again');
+          setTimeout(function () {
+            if (count === 2) {
+              done();
+            }
+          }, 100)
+        })
+      } else {
+        cb('failed');
+      }
+    }, {
+      failTaskOnProcessException: true,
+      maxRetries: Infinity,
+      id: 'id'
+    })
+    q.push({ id: 'a', x: 1 });
+  })
+
 })
