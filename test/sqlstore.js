@@ -2,7 +2,7 @@ var assert = require('assert');
 var Queue = require('../lib/queue');
 var SqlStore = require('../lib/stores/sql');
 
-describe('Store Usage', function() {
+describe('SqlStore Usage', function() {
   it('sql store should queue length', function (done) {
     var s = new SqlStore();
     var q = new Queue(function (n, cb) {
