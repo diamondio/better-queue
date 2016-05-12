@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "extend": "^3.0.0",
+    "lodash": "^4.12.0",
     "node-eta": "^0.9.0",
     "node-uuid": "^1.4.7",
     "pg": "^4.5.5",
