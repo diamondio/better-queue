@@ -1,5 +1,9 @@
-var fs = require('fs');
-var assert = require('assert');
+var fs      = require('fs');
+var assert  = require('assert');
+var mockery = require('mockery');
+mockery.enable({ warnOnReplace: false, warnOnUnregistered: false });
+mockery.registerMock('./PostgresAdapter', require('./fixtures/PostgresAdapter'));
+
 var Queue = require('../lib/queue');
 var MemoryStore = require('../lib/stores/memory');
 var SQLiteStore = require('../lib/stores/sqlite');
@@ -84,7 +88,7 @@ describe('Complex Queue', function() {
       } else {
         cb('fail');
       }
-    }, { maxRetries: 2 })
+    }, { maxRetries: 2, autoResume: false })
     q.on('task_failed', function () {
       done();
     });
@@ -273,7 +277,7 @@ describe('Complex Queue', function() {
           done();
         })
       }, 1)
-    }, { store: s })
+    }, { store: s, autoResume: false })
     q.push(1);
   })
 
@@ -293,7 +297,7 @@ describe('Complex Queue', function() {
     var count = 0;
     var q = new Queue(function (n, cb) {
       count++
-      if (count > 2000) {
+      if (count > 500) {
         cb();
         done();
       } else {

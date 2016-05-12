@@ -1,4 +1,8 @@
-var assert = require('assert');
+var assert  = require('assert');
+var mockery = require('mockery');
+mockery.enable({ warnOnReplace: false, warnOnUnregistered: false });
+mockery.registerMock('./PostgresAdapter', require('./fixtures/PostgresAdapter'));
+
 var Queue = require('../lib/queue');
 
 describe('Basic Queue', function() {
@@ -6,7 +10,7 @@ describe('Basic Queue', function() {
   it('should succeed', function (done) {
     var q = new Queue(function (n, cb) {
       cb(null, n+1)
-    })
+    }, { autoResume: false })
     q.on('task_finish', function (taskId, r) {
       assert.equal(r, 2);
       done();
@@ -19,7 +23,7 @@ describe('Basic Queue', function() {
   it('should fail task if failTaskOnProcessException is true', function (done) {
     var q = new Queue(function (n, cb) {
       throw new Error("failed");
-    })
+    }, { autoResume: false })
     q.on('task_failed', function (taskId, msg) {
       assert.equal(msg, "failed");
       done();
@@ -30,7 +34,7 @@ describe('Basic Queue', function() {
   it('should emit an error if failTaskOnProcessException is false', function (done) {
     var q = new Queue(function (n, cb) {
       throw new Error("failed");
-    }, { failTaskOnProcessException: false })
+    }, { failTaskOnProcessException: false, autoResume: false })
     q.on('error', function () {
       done();
     })
@@ -40,7 +44,7 @@ describe('Basic Queue', function() {
   it('should fail', function (done) {
     var q = new Queue(function (n, cb) {
       cb('nope')
-    })
+    }, { autoResume: false })
     q.on('task_failed', function (taskId, msg) {
       assert.equal(msg, 'nope');
       done();
@@ -187,7 +191,7 @@ describe('Basic Queue', function() {
         done();
       }
       cb();
-    }, { batchSize: 2, batchDelay: 1 });
+    }, { batchSize: 2, batchDelay: 1, autoResume: false });
     q.push(1)
       .on('queued', function () {
         setTimeout(function () {
@@ -201,7 +205,7 @@ describe('Basic Queue', function() {
     var q = new Queue(function (n, cb) { cb() })
     q.on('empty', function () {
       emptied = true;
-    })
+    }, { autoResume: false })
     q.on('drain', function () {
       assert.ok(emptied);
       done();
@@ -355,7 +359,7 @@ describe('Basic Queue', function() {
 
   it('should stop if precondition fails', function (done) {
     var retries = 0;
-    var q = new Queue(function () {
+    var q = new Queue(function (n) {
       assert.equal(retries, 2);
       done();
     }, {
@@ -372,7 +376,7 @@ describe('Basic Queue', function() {
     var called = false;
     var q = new Queue(function (task, cb) {
       throw new Error('fail');
-    })
+    });
     q.push(1, function (err) {
       called = true;
       assert.ok(err);
@@ -403,6 +407,7 @@ describe('Basic Queue', function() {
     var q = new Queue(function (arr) {
       running = true;
     }, {
+      autoResume: false,
       batchSize: 2,
       batchDelay: Infinity,
       id: 'id'
@@ -426,6 +431,7 @@ describe('Basic Queue', function() {
     var q = new Queue(function (arr, cb) {
       cb()
     }, {
+      autoResume: false,
       batchSize: 2,
       id: 'id'
     })
@@ -450,6 +456,7 @@ describe('Basic Queue', function() {
         cb('failed');
       }
     }, {
+      autoResume: false,
       failTaskOnProcessException: true,
       maxRetries: Infinity,
       id: 'id'
