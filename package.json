@@ -27,12 +27,13 @@
   },
   "homepage": "https://github.com/diamondio/better-queue",
   "devDependencies": {
-    "mocha": "^2.3.4"
+    "mocha": "^2.3.4",
   },
   "dependencies": {
+    "extend": "^3.0.0",
     "node-eta": "^0.9.0",
     "node-uuid": "^1.4.7",
-    "sequelize": "^3.23.0",
+    "pg": "^4.5.5",
     "sqlite3": "^3.1.1"
   }
 }
