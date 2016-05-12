@@ -12,8 +12,7 @@ MockPostgresAdapter.prototype.connect = function (cb) {
     return cb();
   }
 
-  var self = this;
-  PostgresAdapter.prototype.connect.call(self, function (err, client) {
+  PostgresAdapter.prototype.connect.call(this, function (err, client) {
     if (err) return cb(err);
     g_client = client;
     cb();
