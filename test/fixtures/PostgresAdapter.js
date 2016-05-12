@@ -2,6 +2,9 @@ var PostgresAdapter = require('../../lib/stores/PostgresAdapter');
 var g_client; // reuse the connection
 
 function MockPostgresAdapter(opts) {
+  opts.username = 'diamond';
+  opts.dbname = 'diamond';
+  opts.verbose = false;
   PostgresAdapter.call(this, opts);
 }
 
