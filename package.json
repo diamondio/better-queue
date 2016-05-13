@@ -1,6 +1,6 @@
 {
   "name": "better-queue",
-  "version": "3.7.3",
+  "version": "3.7.4",
   "description": "Better Queue for NodeJS",
   "main": "lib/queue.js",
   "directories": {
@@ -27,11 +27,16 @@
   },
   "homepage": "https://github.com/diamondio/better-queue",
   "devDependencies": {
-    "mocha": "^2.3.4"
+    "async": "^2.0.0-rc.4",
+    "mocha": "^2.3.4",
+    "mockery": "^1.7.0"
   },
   "dependencies": {
+    "extend": "^3.0.0",
+    "lodash": "^4.12.0",
     "node-eta": "^0.9.0",
     "node-uuid": "^1.4.7",
+    "pg": "^4.5.5",
     "sqlite3": "^3.1.1"
   }
 }

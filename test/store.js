@@ -1,6 +1,5 @@
 var assert = require('assert');
 var Queue = require('../lib/queue');
-var MemoryStore = require('../lib/stores/memory');
 
 describe('Store Usage', function() {
 

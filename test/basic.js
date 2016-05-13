@@ -1,12 +1,14 @@
 var assert = require('assert');
+var helper = require('./lib/helper');
 var Queue = require('../lib/queue');
 
 describe('Basic Queue', function() {
+  afterEach(helper.destroyQueues);
 
   it('should succeed', function (done) {
     var q = new Queue(function (n, cb) {
       cb(null, n+1)
-    })
+    }, { autoResume: true })
     q.on('task_finish', function (taskId, r) {
       assert.equal(r, 2);
       done();
@@ -14,33 +16,36 @@ describe('Basic Queue', function() {
     q.push(1, function (err, r) {
       assert.equal(r, 2);
     })
+    this.q = q;
   });
 
   it('should fail task if failTaskOnProcessException is true', function (done) {
     var q = new Queue(function (n, cb) {
       throw new Error("failed");
-    })
+    }, { autoResume: true })
     q.on('task_failed', function (taskId, msg) {
       assert.equal(msg, "failed");
       done();
     })
     q.push(1)
+    this.q = q;
   });
 
   it('should emit an error if failTaskOnProcessException is false', function (done) {
     var q = new Queue(function (n, cb) {
       throw new Error("failed");
-    }, { failTaskOnProcessException: false })
+    }, { failTaskOnProcessException: false, autoResume: true })
     q.on('error', function () {
       done();
     })
     q.push(1)
+    this.q = q;
   });
 
   it('should fail', function (done) {
     var q = new Queue(function (n, cb) {
       cb('nope')
-    })
+    }, { autoResume: true })
     q.on('task_failed', function (taskId, msg) {
       assert.equal(msg, 'nope');
       done();
@@ -48,6 +53,7 @@ describe('Basic Queue', function() {
     q.push(1, function (err, r) {
       assert.equal(err, 'nope');
     })
+    this.q = q;
   });
 
   it('should run fifo', function (done) {
@@ -78,6 +84,7 @@ describe('Basic Queue', function() {
       assert.equal(finished, 2);
       finished++;
     })
+    this.q = q;
   })
 
   it('should prioritize', function (done) {
@@ -110,6 +117,7 @@ describe('Basic Queue', function() {
       finished++;
       done()
     });
+    this.q = q;
   })
 
   it('should run filo', function (done) {
@@ -142,6 +150,7 @@ describe('Basic Queue', function() {
       assert.equal(finished, 0);
       finished++;
     })
+    this.q = q;
   })
 
   it('should filter before process', function (done) {
@@ -157,6 +166,7 @@ describe('Basic Queue', function() {
       assert.equal(r, 3);
       done();
     })
+    this.q = q;
   })
 
   it('should batch delay', function (done) {
@@ -176,6 +186,7 @@ describe('Basic Queue', function() {
     q.push(1);
     q.push(2);
     q.push(3);
+    this.q = q;
   })
 
   it('should batch 2', function (done) {
@@ -187,13 +198,14 @@ describe('Basic Queue', function() {
         done();
       }
       cb();
-    }, { batchSize: 2, batchDelay: 1 });
+    }, { batchSize: 2, batchDelay: 1, autoResume: true });
     q.push(1)
       .on('queued', function () {
         setTimeout(function () {
           q.push(2);
         }, 2)
       })
+    this.q = q;
   })
 
   it('should drain and empty', function (done) {
@@ -201,7 +213,7 @@ describe('Basic Queue', function() {
     var q = new Queue(function (n, cb) { cb() })
     q.on('empty', function () {
       emptied = true;
-    })
+    }, { autoResume: true })
     q.on('drain', function () {
       assert.ok(emptied);
       done();
@@ -217,6 +229,7 @@ describe('Basic Queue', function() {
     q.push(1)
     q.push(2)
     q.push(3)
+    this.q = q;
   })
 
   it('should drain only once the task is complete', function (done) {
@@ -230,6 +243,7 @@ describe('Basic Queue', function() {
       done();
     });
     q.push(1);
+    this.q = q;
   });
 
   it('should queue 50 things', function (done) {
@@ -248,6 +262,7 @@ describe('Basic Queue', function() {
         })
       })(i)
     }
+    this.q = q;
   });
 
   it('should concurrently handle tasks', function (done) {
@@ -277,6 +292,7 @@ describe('Basic Queue', function() {
     q.push(1, finish);
     q.push(2, finish);
     q.push(3, finish);
+    this.q = q;
   })
 
   it('should pause and resume', function (done) {
@@ -306,6 +322,7 @@ describe('Basic Queue', function() {
       })
     assert.ok(!running);
     q.resume();
+    this.q = q;
   })
 
   it('should timeout and fail', function (done) {
@@ -326,6 +343,7 @@ describe('Basic Queue', function() {
           done();
         }, 5)
       })
+    this.q = q;
   })
 
   it('should cancel while running and in queue', function (done) {
@@ -351,11 +369,12 @@ describe('Basic Queue', function() {
           q.push({ id: 1, n: 2 });
         })
       });
+    this.q = q;
   })
 
   it('should stop if precondition fails', function (done) {
     var retries = 0;
-    var q = new Queue(function () {
+    var q = new Queue(function (n) {
       assert.equal(retries, 2);
       done();
     }, {
@@ -366,13 +385,14 @@ describe('Basic Queue', function() {
       preconditionRetryTimeout: 1
     })
     q.push(1);
+    this.q = q;
   })
 
   it('should call cb on throw', function (done) {
     var called = false;
     var q = new Queue(function (task, cb) {
       throw new Error('fail');
-    })
+    });
     q.push(1, function (err) {
       called = true;
       assert.ok(err);
@@ -381,6 +401,7 @@ describe('Basic Queue', function() {
       assert.ok(called);
       done();
     });
+    this.q = q;
   })
 
   it('should respect batchDelayTimeout', function (done) {
@@ -396,6 +417,7 @@ describe('Basic Queue', function() {
     setTimeout(function () {
       q.push(2);
     }, 1)
+    this.q = q;
   })
 
   it('should merge but not batch until the delay has happened', function (done) {
@@ -403,6 +425,7 @@ describe('Basic Queue', function() {
     var q = new Queue(function (arr) {
       running = true;
     }, {
+      autoResume: true,
       batchSize: 2,
       batchDelay: Infinity,
       id: 'id'
@@ -415,6 +438,7 @@ describe('Basic Queue', function() {
       assert.ok(!running);
       done();
     }, 10)
+    this.q = q;
   })
 
   it('merge batches should call all push callbacks', function (done) {
@@ -426,11 +450,13 @@ describe('Basic Queue', function() {
     var q = new Queue(function (arr, cb) {
       cb()
     }, {
+      autoResume: true,
       batchSize: 2,
       id: 'id'
     })
     q.push({ id: 'a', x: 1 }, finish)
     q.push({ id: 'a', x: 2 }, finish)
+    this.q = q;
   })
 
   it('cancel should not retry', function (done) {
@@ -450,11 +476,13 @@ describe('Basic Queue', function() {
         cb('failed');
       }
     }, {
+      autoResume: true,
       failTaskOnProcessException: true,
       maxRetries: Infinity,
       id: 'id'
     })
     q.push({ id: 'a', x: 1 });
+    this.q = q;
   })
 
 })
