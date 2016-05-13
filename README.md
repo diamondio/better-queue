@@ -666,7 +666,7 @@ A process function is required, all other options are optional.
 - `push(task, cb)` - Push a task onto the queue, with an optional callback when it completes. Returns a `Ticket` object.
 - `pause()` - Pauses the queue: tries to pause running tasks and prevents tasks from getting processed until resumed.
 - `resume()` - Resumes the queue and its runnign tasks.
-- `destroy()` - Destroys the queue: closes the store, tries to clean up.
+- `destroy(cb)` - Destroys the queue: closes the store, tries to clean up.
 - `use(store)` - Sets the queue to read from and write to the given store.
 - `getStats()` - Gets the aggregate stats for the queue. Returns an object with properties `successRate`, `peak`, `total` and `average`, representing the success rate on tasks, peak number of items queued, total number of items processed and average processing time, respectively.
 - `resetStats()` - Resets all of the aggregate stats.

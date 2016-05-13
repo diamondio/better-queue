@@ -1,14 +1,27 @@
-var fs      = require('fs');
+var async   = require('async');
 var assert  = require('assert');
+
 var mockery = require('mockery');
 mockery.enable({ warnOnReplace: false, warnOnUnregistered: false });
 mockery.registerMock('./PostgresAdapter', require('./fixtures/PostgresAdapter'));
+mockery.registerMock('./SqliteAdapter', require('./fixtures/SqliteAdapter'));
 
 var Queue = require('../lib/queue');
 var MemoryStore = require('../lib/stores/memory');
 var SQLiteStore = require('../lib/stores/sqlite');
 
 describe('Complex Queue', function() {
+  afterEach(function (done) {
+    async.each([this.q, this.q1, this.q2], function (q, qCB) {
+      if (!q) return qCB();
+      setImmediate(function () {
+        q.destroy(qCB);
+      });
+    }, function (err) {
+      if (err) console.error(err);
+      done();
+    });
+  });
 
   it('should run in batch mode', function (done) {
     var q = new Queue({
@@ -40,9 +53,11 @@ describe('Complex Queue', function() {
       assert.equal(total, 6);
       done();
     })
+    this.q = q;
   })
 
   it('should store properly', function (done) {
+    var self = this;
     var s = new MemoryStore();
     var finished = 0;
     var queued = 0;
@@ -57,12 +72,14 @@ describe('Complex Queue', function() {
             done();
           }
         }, { store: s });
+        self.q2 = q2;
       }
     })
     q1.pause();
     q1.push(1);
     q1.push(2);
     q1.push(3);
+    this.q1 = q1;
   })
 
   it('should retry', function (done) {
@@ -77,6 +94,7 @@ describe('Complex Queue', function() {
       }
     }, { maxRetries: 3 });
     q.push(1);
+    this.q = q;
   })
 
   it('should fail retry', function (done) {
@@ -93,6 +111,7 @@ describe('Complex Queue', function() {
       done();
     });
     q.push(1);
+    this.q = q;
   })
 
   it('should process delay', function (done) {
@@ -111,6 +130,7 @@ describe('Complex Queue', function() {
     q.pause();
     q.push(1);
     q.push(2);
+    this.q = q;
   })
 
   it('should max timeout', function (done) {
@@ -122,6 +142,7 @@ describe('Complex Queue', function() {
     q.push(1, function (err, r) {
       assert.equal(err, 'task_timeout');
     });
+    this.q = q;
   })
 
   it('should merge tasks', function (done) {
@@ -159,6 +180,7 @@ describe('Complex Queue', function() {
     q.push({ id: '1', x: 2 }, function (err, r) {
       assert.ok(!err);
     });
+    this.q = q;
   })
   
   it('should respect id property (string)', function (done) {
@@ -200,6 +222,7 @@ describe('Complex Queue', function() {
     q.push({ name: 'jim', x: 1 });
     q.push({ name: 'jim', x: 1 });
     q.push({ name: 'mary', x: 2 });
+    this.q = q;
   })
   
   it('should respect id property (function)', function (done) {
@@ -236,6 +259,7 @@ describe('Complex Queue', function() {
     q.push(3);
     q.push(4);
     q.push(5);
+    this.q = q;
   })
   
   it('should cancel if running', function (done) {
@@ -263,41 +287,42 @@ describe('Complex Queue', function() {
           q.push({ id: 1 });
         }, 1)
       });
+    this.q = q;
   })
 
   it('should release lock after running (sqlite)', function (done) {
-    var testDB = __dirname + '/test-sqlite.db';
-    var s = new SQLiteStore({ path: testDB });
+    var s = new SQLiteStore();
     var q = new Queue(function (n, cb) {
       cb();
       setTimeout(function () {
         s.getRunningTasks(function (err, tasks) {
           assert.ok(!Object.keys(tasks).length)
-          fs.unlinkSync(testDB);
           done();
         })
       }, 1)
     }, { store: s, autoResume: false })
     q.push(1);
+    this.q = q;
   })
 
   it('should resume running task (sqlite)', function (done) {
-    var testDB = __dirname + '/test-sqlite.db';
-    var s = new SQLiteStore({ path: testDB });
+    var self = this;
+    var s = new SQLiteStore();
     var q1 = new Queue(function () {
       var q2 = new Queue(function () {
-        fs.unlinkSync(testDB);
         done();
       }, { store: s })
+      self.q2 = q2;
     }, { store: s })
     q1.push(1);
+    this.q1 = q1;
   })
   
   it('failed task should not stack overflow', function (done) {
     var count = 0;
     var q = new Queue(function (n, cb) {
       count++
-      if (count > 500) {
+      if (count > 100) {
         cb();
         done();
       } else {
@@ -307,6 +332,7 @@ describe('Complex Queue', function() {
       maxRetries: Infinity
     })
     q.push(1);
+    this.q = q;
   })
 
 
