@@ -1,22 +1,9 @@
-var assert  = require('assert');
-var mockery = require('mockery');
-mockery.enable({ warnOnReplace: false, warnOnUnregistered: false });
-mockery.registerMock('./PostgresAdapter', require('./fixtures/PostgresAdapter'));
-mockery.registerMock('./SqliteAdapter', require('./fixtures/SqliteAdapter'));
-
+var assert = require('assert');
+var helper = require('./lib/helper');
 var Queue = require('../lib/queue');
 
 describe('Basic Queue', function() {
-  afterEach(function (done) {
-    var self = this;
-    if (!self.q) return done();
-    setImmediate(function () {
-      self.q.destroy(function (err) {
-        if (err) console.error(err);
-        done();
-      });
-    });
-  });
+  afterEach(helper.destroyQueues);
 
   it('should succeed', function (done) {
     var q = new Queue(function (n, cb) {

@@ -1,8 +1,9 @@
 var assert = require('assert');
+var helper = require('./lib/helper');
 var Queue = require('../lib/queue');
-var MemoryStore = require('../lib/stores/memory');
 
 describe('Stats', function() {
+  afterEach(helper.destroyQueues);
 
   it('should get stat', function (done) {
     var completed = 0;
@@ -26,6 +27,7 @@ describe('Stats', function() {
     q.push(1);
     q.push(1);
     q.push(1);
+    this.q = q;
   })
 
   it('should reset stat', function (done) {
@@ -51,6 +53,7 @@ describe('Stats', function() {
         q.push(2);
       });
     });
+    this.q = q;
   })
 
 

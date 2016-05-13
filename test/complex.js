@@ -1,27 +1,12 @@
-var async   = require('async');
-var assert  = require('assert');
-
-var mockery = require('mockery');
-mockery.enable({ warnOnReplace: false, warnOnUnregistered: false });
-mockery.registerMock('./PostgresAdapter', require('./fixtures/PostgresAdapter'));
-mockery.registerMock('./SqliteAdapter', require('./fixtures/SqliteAdapter'));
+var assert = require('assert');
+var helper = require('./lib/helper');
 
 var Queue = require('../lib/queue');
 var MemoryStore = require('../lib/stores/memory');
 var SQLiteStore = require('../lib/stores/sqlite');
 
 describe('Complex Queue', function() {
-  afterEach(function (done) {
-    async.each([this.q, this.q1, this.q2], function (q, qCB) {
-      if (!q) return qCB();
-      setImmediate(function () {
-        q.destroy(qCB);
-      });
-    }, function (err) {
-      if (err) console.error(err);
-      done();
-    });
-  });
+  afterEach(helper.destroyQueues);
 
   it('should run in batch mode', function (done) {
     var q = new Queue({
