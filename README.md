@@ -563,24 +563,39 @@ For your convenience, we have added compatibility for a few storage options.
 By default, we are using an in-memory store that doesn't persist. You can change
 to one of our other built in stores by passing in the `store` option.
 
-```js
-var q = new Queue(fn, {
-  store: {
-    type: "sqlite",
-    path: "/path/to/db"
-  }
-});
-```
-
-The type is one of the types listed below, and the rest of the object is passed
-to the store as options.
-
-
 #### Built-in store
 
 Currently, we support the following stores:
 
  - memory
+ - sql (SQLite, PostgresSQL)
+
+#### SQLite store
+```
+var q = new Queue(fn, {
+  store: {
+    type: 'sql',
+    dialect: 'sqlite',
+    path: '/path/to/sqlite/file'
+  }
+});
+```
+
+#### PostgreSQL store
+```
+var q = new Queue(fn, {
+  store: {
+    type: 'sql',
+    dialect: 'postgres',
+    host: 'localhost',
+    port: 5432,
+    username: 'username',
+    password: 'password',
+    dbname: 'template1',
+    tableName: 'tasks'
+  }
+});
+```
 
 Please help us add support for more stores; contributions are welcome!
 
