@@ -568,7 +568,7 @@ to one of our other built in stores by passing in the `store` option.
 Currently, we support the following stores:
 
  - memory
- - sql (SQLite, PostgresSQL)
+ - sql (SQLite, PostgreSQL)
 
 #### SQLite store
 ```
