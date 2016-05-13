@@ -8,7 +8,7 @@ describe('Basic Queue', function() {
   it('should succeed', function (done) {
     var q = new Queue(function (n, cb) {
       cb(null, n+1)
-    }, { autoResume: false })
+    }, { autoResume: true })
     q.on('task_finish', function (taskId, r) {
       assert.equal(r, 2);
       done();
@@ -22,7 +22,7 @@ describe('Basic Queue', function() {
   it('should fail task if failTaskOnProcessException is true', function (done) {
     var q = new Queue(function (n, cb) {
       throw new Error("failed");
-    }, { autoResume: false })
+    }, { autoResume: true })
     q.on('task_failed', function (taskId, msg) {
       assert.equal(msg, "failed");
       done();
@@ -34,7 +34,7 @@ describe('Basic Queue', function() {
   it('should emit an error if failTaskOnProcessException is false', function (done) {
     var q = new Queue(function (n, cb) {
       throw new Error("failed");
-    }, { failTaskOnProcessException: false, autoResume: false })
+    }, { failTaskOnProcessException: false, autoResume: true })
     q.on('error', function () {
       done();
     })
@@ -45,7 +45,7 @@ describe('Basic Queue', function() {
   it('should fail', function (done) {
     var q = new Queue(function (n, cb) {
       cb('nope')
-    }, { autoResume: false })
+    }, { autoResume: true })
     q.on('task_failed', function (taskId, msg) {
       assert.equal(msg, 'nope');
       done();
@@ -198,7 +198,7 @@ describe('Basic Queue', function() {
         done();
       }
       cb();
-    }, { batchSize: 2, batchDelay: 1, autoResume: false });
+    }, { batchSize: 2, batchDelay: 1, autoResume: true });
     q.push(1)
       .on('queued', function () {
         setTimeout(function () {
@@ -213,7 +213,7 @@ describe('Basic Queue', function() {
     var q = new Queue(function (n, cb) { cb() })
     q.on('empty', function () {
       emptied = true;
-    }, { autoResume: false })
+    }, { autoResume: true })
     q.on('drain', function () {
       assert.ok(emptied);
       done();
@@ -425,7 +425,7 @@ describe('Basic Queue', function() {
     var q = new Queue(function (arr) {
       running = true;
     }, {
-      autoResume: false,
+      autoResume: true,
       batchSize: 2,
       batchDelay: Infinity,
       id: 'id'
@@ -450,7 +450,7 @@ describe('Basic Queue', function() {
     var q = new Queue(function (arr, cb) {
       cb()
     }, {
-      autoResume: false,
+      autoResume: true,
       batchSize: 2,
       id: 'id'
     })
@@ -476,7 +476,7 @@ describe('Basic Queue', function() {
         cb('failed');
       }
     }, {
-      autoResume: false,
+      autoResume: true,
       failTaskOnProcessException: true,
       maxRetries: Infinity,
       id: 'id'

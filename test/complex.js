@@ -91,7 +91,7 @@ describe('Complex Queue', function() {
       } else {
         cb('fail');
       }
-    }, { maxRetries: 2, autoResume: false })
+    }, { maxRetries: 2, autoResume: true })
     q.on('task_failed', function () {
       done();
     });
@@ -285,7 +285,7 @@ describe('Complex Queue', function() {
           done();
         })
       }, 1)
-    }, { store: s, autoResume: false })
+    }, { store: s, autoResume: true })
     q.push(1);
     this.q = q;
   })
