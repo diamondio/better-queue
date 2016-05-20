@@ -99,12 +99,22 @@ describe('Complex Queue', function() {
     this.q = q;
   })
 
-  it('should process delay', function (done) {
-    var q = new Queue(function (tasks, cb) {
-      assert.equal(tasks.length, 2);
+  it('should respect afterProcessDelay', function (done) {
+    var delay = 100;
+    var finished = 0;
+    var startTime;
+    var q = new Queue(function (task, cb) {
+      finished++;
       cb();
-      done();
-    },  { batchSize: 3, processDelay: 3 });
+      if (finished === 1) {
+        startTime = +(new Date());
+      } else if (finished === 2) {
+        var endTime = +(new Date());
+        var elapsedTime = endTime - startTime;
+        assert(elapsedTime >= delay);
+        done();
+      }
+    },  { batchSize: 1, afterProcessDelay: delay });
     var queued = 0;
     q.on('task_queued', function () {
       queued++;

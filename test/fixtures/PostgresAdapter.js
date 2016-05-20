@@ -14,7 +14,7 @@ MockPostgresAdapter.prototype = Object.create(PostgresAdapter.prototype);
 MockPostgresAdapter.prototype.connect = function (cb) {
   if (g_client) {
     this.adapter = g_client;
-    return cb();
+    return PostgresAdapter.prototype.initialize.call(this, cb);
   }
 
   PostgresAdapter.prototype.connect.call(this, function (err, client) {
