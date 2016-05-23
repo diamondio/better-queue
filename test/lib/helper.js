@@ -9,7 +9,7 @@ exports.destroyQueues = function (done) {
     if (!q) return qCB();
     setTimeout(function () {
       q.destroy(qCB);
-    }, 5);
+    }, 15);
   }, function (err) {
     if (err) console.error(err);
     done();

@@ -182,7 +182,7 @@ describe('Basic Queue', function() {
         cb();
         return done();
       }
-    }, { batchSize: 2, batchDelay: 2 });
+    }, { batchSize: 2, batchDelay: 5, failTaskOnProcessException: false });
     q.push(1);
     q.push(2);
     q.push(3);
