@@ -1,7 +1,5 @@
 var PostgresAdapter = require('../../lib/stores/PostgresAdapter');
 
-var g_client; // reuse the connection
-
 function MockPostgresAdapter(opts) {
   opts.verbose = false;
   opts.username = 'diamond';
@@ -10,18 +8,5 @@ function MockPostgresAdapter(opts) {
 }
 
 MockPostgresAdapter.prototype = Object.create(PostgresAdapter.prototype);
-
-MockPostgresAdapter.prototype.connect = function (cb) {
-  if (g_client) {
-    this.adapter = g_client;
-    return PostgresAdapter.prototype.initialize.call(this, cb);
-  }
-
-  PostgresAdapter.prototype.connect.call(this, function (err, client) {
-    if (err) return cb(err);
-    g_client = client;
-    cb();
-  });
-};
 
 module.exports = MockPostgresAdapter;

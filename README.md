@@ -570,7 +570,7 @@ Currently, we support the following stores:
  - memory
  - sql (SQLite, PostgreSQL)
 
-#### SQLite store
+#### SQLite store (`npm install sqlite3`)
 ```
 var q = new Queue(fn, {
   store: {
@@ -581,7 +581,7 @@ var q = new Queue(fn, {
 });
 ```
 
-#### PostgreSQL store
+#### PostgreSQL store (`npm install pg`)
 ```
 var q = new Queue(fn, {
   store: {
