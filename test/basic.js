@@ -1,6 +1,11 @@
 var assert = require('assert');
+var async  = require('async');
 var helper = require('./lib/helper');
 var Queue = require('../lib/queue');
+
+
+var numBenchmarkItems = 5000;
+
 
 describe('Basic Queue', function() {
   afterEach(helper.destroyQueues);
@@ -246,23 +251,55 @@ describe('Basic Queue', function() {
     this.q = q;
   });
 
-  it('should queue 50 things', function (done) {
+  it(`should queue ${numBenchmarkItems} things`, function (done) {
+    var finish = function () {
+      console.timeEnd('Queue Time');
+      done();
+    }
+    console.time('Queue Time');
     var q = new Queue(function (n, cb) {
       cb(null, n+1);
     })
     var finished = 0;
-    for (var i = 0; i < 50; i++) {
+    for (var i = 0; i < numBenchmarkItems; i++) {
       (function (n) {
         q.push(n, function (err, r) {
           assert.equal(r, n+1);
           finished++;
-          if (finished === 50) {
-            done();
+          if (finished === numBenchmarkItems) {
+            finish();
           }
         })
       })(i)
     }
     this.q = q;
+  });
+
+  it(`should queue ${numBenchmarkItems} things (async.queue comparison)`, function (done) {
+    var finish = function () {
+      console.timeEnd('Queue Time');
+      done();
+    }
+    console.time('Queue Time');
+
+
+    var q = async.queue(function(n, callback) {
+      setImmediate(function() {
+        callback(null, n+1);
+      });
+    });
+    var finished = 0;
+    for (var i = 0; i < numBenchmarkItems; i++) {
+      (function (n) {
+        q.push(n, function (err, r) {
+          assert.equal(r, n+1);
+          finished++;
+          if (finished === numBenchmarkItems) {
+            finish();
+          }
+        })
+      })(i)
+    }
   });
 
   it('should concurrently handle tasks', function (done) {
