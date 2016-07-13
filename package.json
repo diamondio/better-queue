@@ -29,6 +29,7 @@
   "devDependencies": {
     "async": "^2.0.0-rc.4",
     "extend": "^3.0.0",
+    "fs-extra": "^0.30.0",
     "knex": "^0.11.4",
     "mocha": "^2.3.4",
     "mockery": "^1.7.0",
