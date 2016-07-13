@@ -1,5 +1,6 @@
 var assert = require('assert');
 var helper = require('./lib/helper');
+var fs     = require('fs-extra');
 
 var Queue = require('../lib/queue');
 var MemoryStore = require('../lib/stores/memory');
@@ -330,5 +331,66 @@ describe('Complex Queue', function() {
     this.q = q;
   })
 
+  it('drain should still work with persistent queues', function (done) {
+    var initialQueue = new Queue(function (n, cb) {
+      setTimeout(cb, 1);
+    }, {
+      store: {
+        type: 'sql',
+        dialect: 'sqlite',
+        path: 'testqueue.sql'
+      }
+    })
+    var drained = false;
+    initialQueue.on('drain', function () {
+      drained = true;
+    });
+    initialQueue.push(1);
 
+    setTimeout(function () {
+      initialQueue.destroy();
+
+      assert.ok(drained);
+      done();
+    }, 20)
+  })
+
+  it('drain should still work when there are persisted items at load time', function (done) {
+    var initialQueue = new Queue(function (n, cb) {
+      setTimeout(cb, 100);
+    }, {
+      store: {
+        type: 'sql',
+        dialect: 'sqlite',
+        path: 'testqueue.sql'
+      }
+    });
+    initialQueue.push('' + 1);
+    initialQueue.push('' + 2);
+    setTimeout(function () {
+      // This effectively captures the queue in a state where there were unprocessed items
+      fs.copySync('testqueue.sql', 'testqueue2.sql');
+      initialQueue.destroy();
+      var persistedQueue = new Queue(function (n, cb) {
+        setTimeout(cb, 1);
+      }, {
+        store: {
+          type: 'sql',
+          dialect: 'sqlite',
+          path: 'testqueue2.sql'
+        }
+      })
+      var drained = false;
+      persistedQueue.on('drain', function () {
+        drained = true;
+      });
+      persistedQueue.push(2);
+      setTimeout(function () {
+        persistedQueue.destroy();
+
+        assert.ok(drained);
+        done();
+      }, 140)
+    }, 40)
+  })
 })

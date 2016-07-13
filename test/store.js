@@ -57,7 +57,8 @@ describe('Store Usage', function() {
       getLock: function (lockId, cb) { cb(null, { 'task-id': queued ? 2 : 1 }) },
       getRunningTasks: function (cb) { cb(null, {}) },
       takeFirstN: function (n, cb) { cb(null, 'lock-id') },
-      takeLastN: function (n, cb) { cb() }
+      takeLastN: function (n, cb) { cb() },
+      releaseLock: function (lockId, cb) { cb(null) },
     }
     var q = new Queue(function (n, cb) {
       if (n === 2) {
