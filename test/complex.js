@@ -332,7 +332,7 @@ describe('Complex Queue', function() {
   })
 
   it('drain should still work with persistent queues', function (done) {
-    var initialQueue = new Queue(function (n, cb) {
+    var q = new Queue(function (n, cb) {
       setTimeout(cb, 1);
     }, {
       store: {
@@ -342,17 +342,12 @@ describe('Complex Queue', function() {
       }
     })
     var drained = false;
-    initialQueue.on('drain', function () {
+    q.on('drain', function () {
       drained = true;
-    });
-    initialQueue.push(1);
-
-    setTimeout(function () {
-      initialQueue.destroy();
-
-      assert.ok(drained);
       done();
-    }, 20)
+    });
+    q.push(1);
+    this.q = q;
   })
 
   it('drain should still work when there are persisted items at load time', function (done) {
