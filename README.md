@@ -90,10 +90,10 @@ You can also listen to events on the results of the `push` call.
 ```js
 var q = new Queue(fn);
 q.push(1)
-  .on('done', function (result) {
+  .on('finish', function (result) {
     // Task succeeded with {result}!
   })
-  .on('fail', function (err) {
+  .on('failed', function (err) {
     // Task failed!
   })
 ```
