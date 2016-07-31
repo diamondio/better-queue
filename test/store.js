@@ -86,6 +86,5 @@ describe('Store Usage', function() {
   })
 
   // TODO: Test progress
-  // TODO: Test the actual stores
 
 })
