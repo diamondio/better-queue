@@ -1,6 +1,5 @@
 var assert = require('assert');
 var helper = require('./lib/helper');
-var fs     = require('fs-extra');
 
 var Queue = require('../lib/queue');
 var MemoryStore = require('better-queue-memory');
