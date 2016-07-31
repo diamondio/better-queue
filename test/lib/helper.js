@@ -1,17 +1,9 @@
-var async = require('async');
-var mockery = require('mockery');
-mockery.enable({ warnOnReplace: false, warnOnUnregistered: false });
-mockery.registerMock('./PostgresAdapter', require('../fixtures/PostgresAdapter'));
-mockery.registerMock('./SqliteAdapter', require('../fixtures/SqliteAdapter'));
 
-exports.destroyQueues = function (done) {
-  async.each([this.q, this.q1, this.q2], function (q, qCB) {
-    if (!q) return qCB();
+exports.destroyQueues = function () {
+  [this.q, this.q1, this.q2].forEach(function (q) {
+    if (!q) return;
     setTimeout(function () {
-      q.destroy(qCB);
+      q.destroy();
     }, 15);
-  }, function (err) {
-    if (err) console.error(err);
-    done();
   });
 };

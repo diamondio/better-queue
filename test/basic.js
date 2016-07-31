@@ -7,13 +7,16 @@ describe('Basic Queue', function() {
 
   it('should succeed', function (done) {
     var q = new Queue(function (n, cb) {
+      console.log('here');
       cb(null, n+1)
     }, { autoResume: true })
     q.on('task_finish', function (taskId, r) {
       assert.equal(r, 2);
       done();
     })
+    console.log('pushed...');
     q.push(1, function (err, r) {
+      console.log('here');
       assert.equal(r, 2);
     })
     this.q = q;
