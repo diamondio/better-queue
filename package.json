@@ -1,6 +1,6 @@
 {
   "name": "better-queue",
-  "version": "3.8.2",
+  "version": "3.8.3",
   "description": "Better Queue for NodeJS",
   "main": "lib/queue.js",
   "directories": {
