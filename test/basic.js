@@ -23,8 +23,8 @@ describe('Basic Queue', function() {
     var q = new Queue(function (n, cb) {
       throw new Error("failed");
     }, { autoResume: true })
-    q.on('task_failed', function (taskId, msg) {
-      assert.equal(msg, "failed");
+    q.on('task_failed', function (taskId, err) {
+      assert.equal(err.message, "failed");
       done();
     })
     q.push(1)
