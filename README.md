@@ -1,5 +1,7 @@
 # Better Queue - Powerful flow control
 
+[![Join the chat at https://gitter.im/leanderlee/better-queue](https://badges.gitter.im/leanderlee/better-queue.svg)](https://gitter.im/leanderlee/better-queue?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![npm package](https://nodei.co/npm/better-queue.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/better-queue/)
 
 [![Build status](https://img.shields.io/travis/diamondio/better-queue.svg?style=flat-square)](https://travis-ci.org/diamondio/better-queue)
