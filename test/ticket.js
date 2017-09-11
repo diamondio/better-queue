@@ -59,7 +59,6 @@ describe('Ticket', function() {
       assert.equal(progress.complete, 1);
       assert.equal(progress.total, 2);
       assert.equal(progress.message, 'test');
-      assert.equal(typeof progress.eta, 'string');
       done()
     });
     t.progress({
