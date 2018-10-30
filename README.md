@@ -56,6 +56,7 @@ q.push({ x: 1 })
 - [Queue Management](#queue-management)
 - [Advanced](#advanced)
 - [Storage](#storage)
+- [Using with Webpack](#using-with-webpack)
 - [Full Documentation](#full-documentation)
 
 ---
@@ -634,6 +635,35 @@ q.use({
   }
 })
 ```
+
+[back to top](#table-of-contents)
+
+---
+## Using with Webpack
+
+Better Queue can be used in the browser using the default in-memory store. However you have to create and pass the store to its constructor. 
+
+
+```js
+import Queue = require('better-queue')
+import MemoryStore = require('better-queue-memory')
+
+var q = new Queue(function (input, cb) {
+  
+  // Some processing here ...
+
+  cb(null, result);
+},
+{
+    store: new MemoryStore(),
+  }
+)
+```
+
+### Typescript support
+
+
+
 
 [back to top](#table-of-contents)
 
