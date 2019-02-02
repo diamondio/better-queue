@@ -730,7 +730,7 @@ A process function is required, all other options are optional.
 
 #### Events on Ticket
 
-- `accept` - When the corresponding task is accepted (has passed filter)
+- `accepted` - When the corresponding task is accepted (has passed filter)
 - `queued` - When the corresponding task is queued (and saved into the store)
 - `started` - When the corresponding task is started
 - `progress` - When the corresponding task progress changes
