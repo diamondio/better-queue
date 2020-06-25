@@ -660,9 +660,21 @@ var q = new Queue(function (input, cb) {
 )
 ```
 
-### Typescript support
+### TypeScript Support
 
+Better Queue can be used in TypeScript projects by installing type definitions from the [Definitely Typed](https://github.com/DefinitelyTyped/DefinitelyTyped) repository:
 
+```bash
+npm install --save @types/better-queue
+```
+
+Afterwards, you can simply import the library:
+
+```ts
+import Queue = require('better-queue')
+
+const q: Queue = new Queue(() => {});
+```
 
 
 [back to top](#table-of-contents)
