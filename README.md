@@ -582,6 +582,8 @@ var q = new Queue(fn, {
 });
 ```
 
+Note that this requires `better-queue-sql` or `better-queue-sqlite`.
+
 #### PostgreSQL store (`npm install pg`)
 ```
 var q = new Queue(fn, {
