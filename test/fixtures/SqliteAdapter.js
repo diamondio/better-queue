@@ -1,10 +1,10 @@
-var fs            = require('fs-extra');
-var uuid          = require('uuid');
-var SqliteAdapter = require('../../lib/stores/SqliteAdapter');
+var fs             = require('fs-extra');
+var { v4: uuidv4 } = require('uuid');
+var SqliteAdapter  = require('../../lib/stores/SqliteAdapter');
 
 function MockSqliteAdapter(opts) {
   opts.verbose = false;
-  opts.path = opts.path || uuid.v4() + '.sqlite';
+  opts.path = opts.path || uuidv4() + '.sqlite';
   SqliteAdapter.call(this, opts);
 }
 
