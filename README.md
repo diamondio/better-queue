@@ -536,14 +536,14 @@ apply to the tasks that have not yet finished/failed.
 #### Queue Statistics
 
 You can inspect the queue at any given time to see information about how many items are
-queued, average queue time, success rate and total item processed.
+queued, average queue time in milliseconds, success rate and total item processed.
 
 ```js
 var q = new Queue(fn);
 var stats = q.getStats();
 
 // stats.total = Total tasks processed
-// stats.average = Average process time
+// stats.average = Average process time in milliseconds
 // stats.successRate = % success (between 0 and 1)
 // stats.peak = Most tasks queued at any given point in time
 ```
@@ -727,7 +727,7 @@ A process function is required, all other options are optional.
 - `resume()` - Resumes the queue and its runnign tasks.
 - `destroy(cb)` - Destroys the queue: closes the store, tries to clean up.
 - `use(store)` - Sets the queue to read from and write to the given store.
-- `getStats()` - Gets the aggregate stats for the queue. Returns an object with properties `successRate`, `peak`, `total` and `average`, representing the success rate on tasks, peak number of items queued, total number of items processed and average processing time, respectively.
+- `getStats()` - Gets the aggregate stats for the queue. Returns an object with properties `successRate`, `peak`, `total` and `average`, representing the success rate on tasks, peak number of items queued, total number of items processed and average processing time in milliseconds, respectively.
 - `resetStats()` - Resets all of the aggregate stats.
 
 #### Events on Queue
