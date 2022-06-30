@@ -127,6 +127,35 @@ describe('Complex Queue', function() {
     this.q = q;
   })
 
+  it.only('should remove tasks taking longer than maxTimeout', function (done) {
+    const maxTimeout = 1;
+    const taskTime = 100;
+    const process = async () => {
+      return await new Promise((resolve) => setTimeout(resolve, taskTime));
+    }
+    const q = new Queue(process, { maxTimeout })
+
+    let counter = 0;
+    const maxCounter = 500;
+    const push = () => q.push(1);
+    q.on('task_failed', function (taskId, msg) {
+      if (counter < maxCounter) {
+        counter++;
+        push();
+      } else {
+        assert.equal(counter, maxCounter);
+        const { average } = q.getStats();
+        assert(
+          average <= maxTimeout,
+          `maxTimeout was set to "${maxTimeout}" but average task processing time is "${average}"`
+        );
+        done();
+      }
+    });
+    q.push(1);
+    this.q = q;
+  })
+
   it('should max timeout', function (done) {
     var q = new Queue(function (tasks, cb) {}, { maxTimeout: 1 })
     q.on('task_failed', function (taskId, msg) {
