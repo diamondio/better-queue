@@ -130,14 +130,19 @@ describe('Complex Queue', function() {
   it.only('should remove tasks taking longer than maxTimeout', function (done) {
     const maxTimeout = 1;
     const taskTime = 100;
-    const process = async () => {
-      return await new Promise((resolve) => setTimeout(resolve, taskTime));
+    const process = async (task, cb) => {
+      await new Promise((resolve) => setTimeout(resolve, taskTime));
+      cb();
     }
     const q = new Queue(process, { maxTimeout })
 
     let counter = 0;
     const maxCounter = 500;
-    const push = () => q.push(1);
+    const push = () => {
+      for(let i = 0; i < 100; i++) {
+        q.push(1);
+      }
+    }
     q.on('task_failed', function (taskId, msg) {
       if (counter < maxCounter) {
         counter++;
