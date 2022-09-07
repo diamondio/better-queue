@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/diamondio/better-queue",
   "devDependencies": {
-    "mocha": "^2.3.4",
+    "mocha": "^10.0.0",
     "mocha-junit-reporter": "^1.12.1"
   },
   "dependencies": {
