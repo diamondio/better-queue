@@ -81,6 +81,36 @@ describe('Complex Queue', function() {
     this.q = q;
   })
 
+  it('should retry jobs with same id', function (done) {
+    const maxRetries = 3
+    const getJob = (id = 1) => ({ id, attempt: 0 })
+
+    const q = new Queue((job, cb) => {
+      job.attempt++
+      cb(job)
+    }, { maxRetries })
+
+    let job = getJob(1)
+    q.push(job)
+      .on('failed', err => {
+        assert.equal(err.id, job.id)
+        assert.equal(err.attempt, maxRetries)
+        job = getJob(2)
+        q.push(job)
+          .on('failed', err => {
+          assert.equal(err.id, job.id)
+          assert.equal(err.attempt,maxRetries)
+          job = getJob(1)
+          q.push(job)
+            .on('failed', err => {
+              assert.equal(err.id, job.id)
+              assert.equal(err.attempt, maxRetries, 'job with id 1 shall fail after maxRetries')
+              done()
+            })
+        })
+     })
+  })
+
   it('should fail retry', function (done) {
     var tries = 0;
     var q = new Queue(function (n, cb) {
