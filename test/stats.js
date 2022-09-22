@@ -15,7 +15,6 @@ describe('Stats', function() {
     })
     q.on('task_finish', function (id, result, stat) {
       completed++;
-      console.log(stat)
       elapsedTotals += stat.elapsed;
     })
     q.on('drain', function () {
