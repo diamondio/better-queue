@@ -15,13 +15,14 @@ describe('Stats', function() {
     })
     q.on('task_finish', function (id, result, stat) {
       completed++;
+      console.log(stat)
       elapsedTotals += stat.elapsed;
     })
     q.on('drain', function () {
       var stats = q.getStats();
       assert.ok(stats.peak);
       assert.equal(3, stats.total);
-      assert.equal(elapsedTotals/3, stats.average);
+      assert.equal(Math.round(elapsedTotals / 3 * 1000) / 1000, Math.round(stats.average * 1000) / 1000);
       done();
     })
     q.push(1);
