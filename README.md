@@ -623,6 +623,9 @@ q.use({
   connect: function (cb) {
     // Connect to your db
   },
+  getRunningTasks: function (cb) {
+    // Returns a map of running tasks (lockId => taskIds)
+  },
   getTask: function (taskId, cb) {
     // Retrieves a task
   },
